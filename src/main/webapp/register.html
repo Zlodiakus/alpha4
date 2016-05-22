@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <title>Регистрация</title>
+    <script>
+        function getXmlHttp() {
+            var xmlhttp;
+            try {
+                xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch (e) {
+                try {
+                    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch (E) {
+                    xmlhttp = false;
+                }
+            }
+            if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
+                xmlhttp = new XMLHttpRequest();
+            }
+            return xmlhttp;
+        }
+        var register = function ()
+        {
+        console.log("1");
+            var login = document.getElementById('Login').value;
+            var password = document.getElementById('PSW').value;
+            var password2 = document.getElementById('PSW2').value;
+            var mail = document.getElementById('Mail').value;
+            var invite = document.getElementById('Invite').value;
+            console.log("2");
+            if (login == "" || password == "" || mail == "" || invite == "") {
+                alert("Все поля обязательны к заполнению");
+                return true;
+            } else
+            if (password != password2) {
+                alert("Пароли не совпадают!");
+                return true;
+            } else
+            {
+            console.log("3");
+                var xmlhttp = getXmlHttp();
+                var sending = 'reg.jsp?Login=' + login + '&Password=' + password + '&Invite=' + invite + '&EMail=' + mail;
+                document.getElementById('regButton').style.visibility = 'hidden';
+                xmlhttp.open('GET', sending, true);
+                xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState == 4) {
+                        //if (xmlhttp.status == 200) {
+                        console.log("4");
+                        console.log(xmlhttp.status);
+                            alert(xmlhttp.responseText);
+                            document.getElementById('regButton').style.visibility = 'block';
+                        //}
+                    }
+                }
+                xmlhttp.send();
+            };
+
+            return true;
+        }
+
+    </script>
+</head>
+<body style="margin-left: 10px; margin-right: 15px;">
+<div align="center">
+    <h1>Регистрация</h1>
+    <div class="form-horizontal">
+        <div class="form-group">
+            <label for="Login" class="col-xs-4 col-sm-offset-2 col-sm-2 col-lg-offset-3 col-lg-2 control-label">Имя пользователя:</label>
+            <div class="col-xs-4 col-sm-4 col-lg-2">
+                <input type="text" class="form-control" id="Login">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Mail" class="col-xs-4 col-sm-offset-2 col-sm-2 col-lg-offset-3 col-lg-2 control-label">Почта:</label>
+            <div class="col-xs-4 col-sm-4 col-lg-2">
+                <input type="email" class="form-control" id="Mail">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="PSW" class="col-xs-4 col-sm-offset-2 col-sm-2 col-lg-offset-3 col-lg-2 control-label">Пароль:</label>
+            <div class="col-xs-4 col-sm-4 col-lg-2">
+                <input type="password" class="form-control" id="PSW">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="PSW2" class="col-xs-4 col-sm-offset-2 col-sm-2 col-lg-offset-3 col-lg-2 control-label">Еще раз:</label>
+            <div class="col-xs-4 col-sm-4 col-lg-2">
+                <input type="password" class="form-control" id="PSW2">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="Invite" class="col-xs-4 col-sm-offset-2 col-sm-2 col-lg-offset-3 col-lg-2 control-label">Инвайт-код:</label>
+            <div class="col-xs-4 col-sm-4 col-lg-2">
+                <input type="password" class="form-control" id="Invite">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-offset-4 col-xs-4 col-sm-offset-4 col-sm-4">
+                <button onclick="register();" id="regButton" class="btn btn-info">Зарегистрироваться</button>
+            </div>
+        </div>
+    </div>
+    <div id="result"></div>
+    <br>
+    <div align="left">
+        <h1>Корованы.</h1>
+        <p>Караваны - это тележки с грузом, курсирующие между городами. Караван может перемещаться только по прямой от одного города к другому и
+            обратно.
+            Маршрут задается игроком, нужно подойти в реальности в такое место, координаты которого совпадают с положением города на сканере, чтобы
+            город
+            оказался в вашем радиусе действия. Нажать на город и выбрать кнопку "Начать маршрут" Она выглядит так: стрелочка с зеленой галочкой .
+            Раздастся странный шуршащий звук) . Начало маршрута задано. Теперь надо переместиться к другому городу и нажать кнопку "закончить
+            маршрут"(стрелочка с финишным флажком). Появится милый копытный топот и, возможно, синяя линия маршрута каравана, соединяющая эти города.
+            Маршруты каравана видны только хозяину каравана, чужие маршруты скрыты. Тут же можно начать новый машрут, после завершения маршрута, на
+            месте
+            кнопки"завершить маршрут" появляется кнопка "начать новый". В городе также можно приобрести апгрейд. Всего сейчас в игре 6 апгрейдов. Они
+            распределены по городам, т.е. в одном городе можно купить апгрейд только определенного вида. Апгрейды имеют несколько уровней, возможность
+            купить апгрейд определенного уровня зависит от 2х параметров: уровня игрока и города.</p>
+        <p>Караван, пройдя маршрут от одного города до другого приносит деньги своему владельцу. Чем дольше курсирует караван, тем больше денег вам
+            приходит. Чужой караван можно ГРАБИТЬ. Если установить на пути следования чужого каравана свою засаду, то засада уничтожит караван и
+            принесет
+            вам 10кратную прибыль с каравана. Засада ставится так же на местности, причем работать начинает не сразу по установлению, а через 1.5 часа
+            (на
+            первых уровнях), начала засада окапывается и выгляджит как мужик в яме с лопатой. Когда засада готова, то вместо копающего мужика
+            появляется
+            некий кочевник. Чужая готовая засада выглядит как кочевник в кустах. Засады и свои и чужие можно уничтожать на любой стадии, и во время
+            окапывания, и уже установленные. за уничтожение чужой засады вы получаете денежки, но не много. Свою засаду можно уничтожить и удаленно, в
+            окошке информации на закладке "засады", нажав на крестик. Чужую только на местности. Караван свой тоже можно уничтожить удаленнно, чужой
+            только засадами.</p>
+        <p>Как отличить свой караван от чужого? Чужие караваны помечены агрессивной красной полосой.</p>
+    </div>
+    <br>
+    <a href="https://docs.google.com/forms/d/163DRxC0fbx57fGZhbKkLUUAJWgzXwnzjZNYZLYZGvq8/viewform">Форма связи с разработчиками</a>
+</div>
+</body>
+</html>
