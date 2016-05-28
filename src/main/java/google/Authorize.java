@@ -1,9 +1,7 @@
 package google;
 
 import main.DBUtils;
-import main.MyUtils;
 import org.json.simple.JSONObject;
-import utility.Version;
 
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Shadilan on 28.05.2016.
