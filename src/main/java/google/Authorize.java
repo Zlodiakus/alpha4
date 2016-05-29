@@ -58,6 +58,7 @@ public class Authorize {
             JSONObject jsObject = (new JSONObject());
             jsObject.put("Error", "L0203");
             jsObject.put("Message", "Версия не поддерживается");
+            jsObject.put("Detail", version);
             result = jsObject.toJSONString();
             return result;
         }
