@@ -89,10 +89,10 @@ public class Authorize {
                 jsObject.put("Message", "Пользователь не найден");
                 break;
             case "U0000":
-                break;
+
             default:
                 jsObject.put("Error", "U0000");
-                jsObject.put("Message", token);
+                jsObject.put("Message", "+"+token);
         }
         result = jsObject.toJSONString();
         return result;
@@ -142,7 +142,7 @@ public class Authorize {
                         jsObject.put("Message", "Пользователь не найден");
                         break;
                     case "U0000":
-                        break;
+
                     default:
                         jsObject.put("Error", "U0000");
                         jsObject.put("Message", err);
@@ -227,7 +227,7 @@ public class Authorize {
         PreparedStatement pstmt,query;
         String Token = "T" + UUID.randomUUID().toString();
         String PGUID;
-        String result;
+        String result="Not Changed";
         Connection con= null;
         try {
             con = DBUtils.ConnectDB();
