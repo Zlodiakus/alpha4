@@ -92,7 +92,7 @@ public class Authorize {
                 break;
             default:
                 jsObject.put("Error", "U0000");
-                jsObject.put("Message", "Непредвиденная ошибка");
+                jsObject.put("Message", token);
         }
         result = jsObject.toJSONString();
         return result;
@@ -257,9 +257,9 @@ public class Authorize {
                     query=con.prepareStatement("insert into GameObjects (GUID, Lat, Lng, Type) values (?,100,100,'Player')");
                     query.setString(1, PGUID);
                     query.execute();
-                    query.close();
                     query = con.prepareStatement("insert into PUpgrades(PGUID,UGUID) SELECT ?,u.GUID from Upgrades u WHERE level=0");
                     query.setString(1, PGUID);
+                    query.execute();
                     con.commit();
                 }
                 rs2.close();
@@ -268,6 +268,7 @@ public class Authorize {
                 pstmt.setString(1, PGUID);
                 pstmt.setString(2, Token);
                 pstmt.execute();
+                pstmt.close();
                 con.commit();
                 result=Token;
 
@@ -275,7 +276,7 @@ public class Authorize {
                 result="L0202";
             }
         } catch (NamingException | SQLException e) {
-            result="U0000";
+            result=e.toString();
         }
         try {
             if (con!=null && !con.isClosed()) con.close();
