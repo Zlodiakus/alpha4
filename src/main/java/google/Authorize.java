@@ -177,7 +177,7 @@ public class Authorize {
             //Проверка пользователя
             pstmt = con.prepareStatement("SELECT count(1) from Users WHERE email=? or Login=?");
             pstmt.setString(1, email);
-            pstmt.setString(1, userName);
+            pstmt.setString(2, userName);
             ResultSet rs = pstmt.executeQuery();
             rs.next();
             int cnt = rs.getInt(1);
