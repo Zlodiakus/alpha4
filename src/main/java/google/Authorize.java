@@ -212,7 +212,8 @@ public class Authorize {
                 result="L0303";
             }
         } catch (NamingException | SQLException e) {
-            result="U0000";
+            //result="U0000";
+            result=e.toString();
         }
         try {
             if (con!=null && !con.isClosed()) con.close();
