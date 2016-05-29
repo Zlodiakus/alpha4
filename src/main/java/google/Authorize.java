@@ -147,7 +147,7 @@ public class Authorize {
                         jsObject.put("Message", err);
                         break;
                     default:
-                        jsObject.put("Error", token);
+                        jsObject.put("Token", token);
 
                 }
                 result = jsObject.toJSONString();
@@ -184,7 +184,7 @@ public class Authorize {
             ResultSet rs = pstmt.executeQuery();
             rs.next();
             int cnt = rs.getInt(1);
-            if (cnt!=0){
+            if (cnt==0){
                 //Проверить Инвайт
                 pstmt = con.prepareStatement("SELECT count(1) from Invites WHERE Invite=? and given=1 and used=0");
                 pstmt.setString(1, inviteCode);
