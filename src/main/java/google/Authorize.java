@@ -145,7 +145,7 @@ public class Authorize {
                         break;
                     default:
                         jsObject.put("Error", "U0000");
-                        jsObject.put("Message", "Непредвиденная ошибка");
+                        jsObject.put("Message", err);
                 }
                 result = jsObject.toJSONString();
                 break;
