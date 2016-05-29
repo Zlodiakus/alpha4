@@ -86,13 +86,13 @@ public class Authorize {
         switch (token){
             case "L0202":
                 jsObject.put("Error","L0202");
-                jsObject.put("Error", "Пользователь не найден");
+                jsObject.put("Message", "Пользователь не найден");
                 break;
             case "U0000":
                 break;
             default:
                 jsObject.put("Error", "U0000");
-                jsObject.put("Error", "Непредвиденная ошибка");
+                jsObject.put("Message", "Непредвиденная ошибка");
         }
         result = jsObject.toJSONString();
         return result;
@@ -139,13 +139,13 @@ public class Authorize {
                 switch (token){
                     case "L0202":
                         jsObject.put("Error","L0202");
-                        jsObject.put("Error", "Пользователь не найден");
+                        jsObject.put("Message", "Пользователь не найден");
                         break;
                     case "U0000":
                         break;
                     default:
                         jsObject.put("Error", "U0000");
-                        jsObject.put("Error", "Непредвиденная ошибка");
+                        jsObject.put("Message", "Непредвиденная ошибка");
                 }
                 result = jsObject.toJSONString();
                 break;
