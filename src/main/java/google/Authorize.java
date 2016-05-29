@@ -83,8 +83,17 @@ public class Authorize {
         //Получение токена приложения
         String token=getToken(email);
         JSONObject jsObject = (new JSONObject());
-        jsObject.put("Token", token);
-        jsObject.put("Error", "");
+        switch (token){
+            case "L0202":
+                jsObject.put("Error","L0202");
+                jsObject.put("Error", "Пользователь не найден");
+                break;
+            case "U0000":
+                break;
+            default:
+                jsObject.put("Error", "U0000");
+                jsObject.put("Error", "Непредвиденная ошибка");
+        }
         result = jsObject.toJSONString();
         return result;
     }
@@ -127,9 +136,18 @@ public class Authorize {
         switch (err){
             case "OK":
                 String token=getToken(email);
-                jsObject.put("Token", token);
-                jsObject.put("Error", "Ok");
-                result=jsObject.toJSONString();
+                switch (token){
+                    case "L0202":
+                        jsObject.put("Error","L0202");
+                        jsObject.put("Error", "Пользователь не найден");
+                        break;
+                    case "U0000":
+                        break;
+                    default:
+                        jsObject.put("Error", "U0000");
+                        jsObject.put("Error", "Непредвиденная ошибка");
+                }
+                result = jsObject.toJSONString();
                 break;
             case "L0302":
                 jsObject.put("Error", err);
@@ -253,10 +271,10 @@ public class Authorize {
                 result=Token;
 
             } else {
-                result="~User not found";
+                result="L0202";
             }
         } catch (NamingException | SQLException e) {
-            result="~"+e.toString();
+            result="U0000";
         }
         try {
             if (con!=null && !con.isClosed()) con.close();
