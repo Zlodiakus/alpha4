@@ -46,7 +46,7 @@ public class Generate {
      * @return Cityname
      * @throws SQLException
      */
-    private static String genCityName(Connection con) throws SQLException {
+    public static String genCityName(Connection con) throws SQLException {
        /* if (true)
         {return "test2";} else {}*/
         Random random=new Random();

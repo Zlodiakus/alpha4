@@ -5,10 +5,12 @@ import org.json.simple.JSONObject;
 
 import javax.naming.NamingException;
 //import javax.resource.cci.ResultSet;
+import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
@@ -599,6 +601,31 @@ public class Player {
             rs.close();
             query.close();
             ret = (AmbLeft > 0);
+        } catch (SQLException e) {
+            ret = false;
+        }
+        return ret;
+    }
+
+    public boolean CheckCitiesQuantity() {
+        //select z1.Effect1-(select count(1) from Ambushes where PGUID=?) from Upgrades z1, PUpgrades z2 where z2.UGUID=z1.GUID and z2.PGUID=? and z1.TYPE='set_ambushes'
+        //if (result>0) return true
+        //else return false
+        PreparedStatement query;
+        ResultSet rs;
+        int CitLeft;
+        String result;
+        boolean ret;
+        try {
+            query = con.prepareStatement("select z1.Effect1-(select count(1) from Cities where Creator=?) from Upgrades z1, PUpgrades z2 where z2.UGUID=z1.GUID and z2.PGUID=? and z1.TYPE='founder'");
+            query.setString(1, GUID);
+            query.setString(2, GUID);
+            rs = query.executeQuery();
+            rs.first();
+            CitLeft = rs.getInt(1);
+            rs.close();
+            query.close();
+            ret = (CitLeft > 0);
         } catch (SQLException e) {
             ret = false;
         }
@@ -1209,7 +1236,7 @@ public class Player {
     }
 
 
-    public String sendData(String ReqName, String TGUID, int TLAT, int TLNG, int race) {
+    public String sendData(String ReqName, String TGUID, int TLAT, int TLNG, int RACE, int AMOUNT) {
         String result;
         switch (ReqName) {
             case "ScanRange":
@@ -1246,7 +1273,13 @@ public class Player {
                 result=GetMessage();
                 break;
             case "SetRace":
-                result=setRace(race);
+                result=setRace(RACE);
+                break;
+            case "CreateCity":
+                result=createCity(TLAT,TLNG);
+                break;
+            case "HirePeople":
+                result=hirePeople(TGUID, AMOUNT);
                 break;
             default:
                 result = "{" + '"' + "Error" + '"' + ": " + '"' + "Unknown command." + '"' + "}";
@@ -1255,6 +1288,31 @@ public class Player {
             con.close();
         } catch (SQLException e) {result="Connection not closed! "+result;}
         return result;
+    }
+
+    private String hirePeople(String TGUID, int AMOUNT) {
+        return "OK";
+    }
+
+    private String createCity(int TLAT, int TLNG) {
+        int TTS, Radius, Life;
+        String res, CGUID;
+        MyUtils.Logwrite("createCity","Started by "+Name, r.freeMemory());
+        if (MyUtils.RangeCheck(Lat, Lng, TLAT, TLNG) <= getRadius()) {
+            if (CheckCitiesQuantity()) {
+                CGUID=UUID.randomUUID().toString();
+                City city = new City(CGUID, con);
+                res = city.createCity(GUID, TLAT, TLNG);
+            } else {
+                jresult.put("Error", "Достигнут лимит основанных городов!");
+                res=jresult.toString();
+            }
+        } else {
+            jresult.put("Error", "Слишком далеко!");
+            res=jresult.toString();
+        }
+        MyUtils.Logwrite("createCity","Finished by "+Name, r.freeMemory());
+        return res;
     }
 
     private String GetMessage() {

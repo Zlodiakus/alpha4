@@ -1,11 +1,16 @@
 package main;
 
+import org.json.simple.JSONObject;
+
 import javax.naming.NamingException;
 import javax.persistence.criteria.CriteriaBuilder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created by Well on 03.02.2016.
@@ -45,6 +50,111 @@ public class City {
         Level=CLevel;
         Name=CName;
         con=CON;
+    }
+
+    private boolean canCreateCity(String PGUID, int LAT, int LNG, int mapper, Connection con) {
+        //TODO use deltas instead of numbers
+        PreparedStatement query;
+        ResultSet rs;
+        String CName, minName="в чистом поле";
+        int TLat,TLng, TRadius, CLevel;
+        double minDist=10000, curDist;
+        boolean result=true;
+        int delta_lat=(int)(1000000*Math.asin((180/3.1415926)*(375-mapper)/(6378137))); //это 375 минус апгрейд картографера метров
+        int delta_lng=(int)(1000000*Math.asin((180/3.1415926)*(375-mapper)/(6378137*Math.cos((LAT/1000000)*3.1415926/180)))); //и это 375 минус апгрейд картографера метров
+        int delta_lat2=(int)(1000000*Math.asin((180/3.1415926)*(625-mapper)/(6378137))); //это 375 минус апгрейд картографера метров
+        int delta_lng2=(int)(1000000*Math.asin((180/3.1415926)*(625-mapper)/(6378137*Math.cos((LAT/1000000)*3.1415926/180)))); //и это 375 минус апгрейд картографера метров
+        try {
+           query = con.prepareStatement("select z2.Name from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z2.PGUID=? and z1.Type='City' and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+?");
+            query.setString(1,PGUID);
+            query.setInt(2, LAT);
+            query.setInt(3,delta_lat2);
+            query.setInt(4,delta_lat2);
+            query.setInt(5, LNG);
+            query.setInt(6,delta_lng2);
+            query.setInt(7,delta_lng2);
+            rs = query.executeQuery();
+            if (rs.isBeforeFirst()) {
+                        result=false;
+                    }
+            rs.close();
+            query.close();
+            if (result) {
+                query = con.prepareStatement("select z2.Name from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z1.Type='City' and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+?");
+                query.setInt(1, LAT);
+                query.setInt(2,delta_lat);
+                query.setInt(3,delta_lat);
+                query.setInt(4, LNG);
+                query.setInt(5,delta_lng);
+                query.setInt(6,delta_lng);
+                rs = query.executeQuery();
+                if (rs.isBeforeFirst()) {
+                    result=false;
+                }
+                rs.close();
+                query.close();
+            }
+        } catch (SQLException e) {
+            MyUtils.Logwrite("City.canCreateCity", "SQL Error: " + e.toString());
+            result=false;
+        }
+        return result;
+    }
+
+    public String createCity(String PGUID, int TLAT, int TLNG) {
+        PreparedStatement query;
+        int LAT, LNG, rand, mapper=0;
+        JSONObject jresult = new JSONObject();
+        if (canCreateCity(PGUID, TLAT, TLNG, mapper, con)) {
+            try {
+
+                int i=0;
+                Random random=new Random();
+                String [] upgrades = new String [6];
+                    query=con.prepareStatement("select distinct Type from Upgrades");
+                    ResultSet rs=query.executeQuery();
+                    if (rs.isBeforeFirst()) {
+                        while (rs.next()) {
+                            i=i+1;
+                            upgrades[i-1]=rs.getString(1);
+                        }
+                        query.close();
+                        rs.close();
+                    }
+                    else {query.close();rs.close();return "Ошибка обращения к базе данных при поиске доступных апгрейдов!";}
+
+                query = con.prepareStatement("INSERT INTO Cities (GUID,Name,UpgradeType, Creator) VALUES(?,?,?,?)");
+                query.setString(1, GUID);
+                query.setString(2, Generate.genCityName(con));
+                query.setString(3, upgrades[random.nextInt(6)]);
+                query.setString(4, PGUID);
+                query.execute();
+                query.close();
+
+                query = con.prepareStatement("INSERT INTO GameObjects(GUID,Lat,Lng,Type)VALUES(?,?,?,'city')");
+                query.setString(1, GUID);
+                    rand=(int)(Math.random()*2*(125-mapper))-(125-mapper);
+                    int delta_lat_rand=(int)(1000000*Math.asin((180/3.1415926)*(rand)/(6378137)));
+                    int delta_lng_rand=(int)(1000000*Math.asin((180/3.1415926)*(rand)/(6378137*Math.cos((TLAT/1000000)*3.1415926/180))));
+                    LAT=TLAT+delta_lat_rand;
+                    LNG=TLNG+delta_lng_rand;
+                query.setInt(2, LAT);
+                query.setInt(3, LNG);
+                query.execute();
+                query.close();
+                con.commit();
+                jresult.put("Result", "OK");
+            } catch (SQLException e) {
+                jresult.put("Error", "Ошибка взаимодействия с базой данных при установке города");
+                    MyUtils.Logwrite("City.createCity", "PGUID=(" + PGUID + ")" + e.toString());
+            }
+        } else {
+            //jresult.put("Error", "Can't set ambush here. City or another ambush is too close.");
+            jresult.put("Error", "Невозможно основать город здесь. Другой город слишком близко!");
+        }
+
+
+        return jresult.toString();
     }
 
     public String getUpgradeType() {
