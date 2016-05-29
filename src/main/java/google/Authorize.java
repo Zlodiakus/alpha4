@@ -107,13 +107,13 @@ public class Authorize {
         //Проверка Версии
         if (!Version.checkVersion(version)) {
             JSONObject jsObject = (new JSONObject());
-            jsObject.put("Error", "L0303");
+            jsObject.put("Error", "L0304");
             jsObject.put("Message", "Версия не поддерживается");
             result = jsObject.toJSONString();
             return result;
         }
         //Проверка HASH
-        if (!Version.checkHash(hash,version,"Authorize",googleToken,userName,invite)){
+        if (!Version.checkHash(hash,version,"Register",googleToken,userName,invite)){
             JSONObject jsObject = (new JSONObject());
             jsObject.put("Error", "H0101");
             jsObject.put("Message", "Хэш не верен");
