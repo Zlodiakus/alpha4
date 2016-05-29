@@ -91,6 +91,7 @@ public class Authorize {
             case "U0000":
                 jsObject.put("Error", "U0000");
                 jsObject.put("Message", token);
+                break;
             default:
                 jsObject.put("Token", "U0000");
         }
