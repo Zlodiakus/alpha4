@@ -93,7 +93,7 @@ public class Authorize {
                 jsObject.put("Message", token);
                 break;
             default:
-                jsObject.put("Token", "U0000");
+                jsObject.put("Token",token);
         }
         result = jsObject.toJSONString();
         return result;
