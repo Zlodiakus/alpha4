@@ -89,10 +89,10 @@ public class Authorize {
                 jsObject.put("Message", "Пользователь не найден");
                 break;
             case "U0000":
-
-            default:
                 jsObject.put("Error", "U0000");
-                jsObject.put("Message", "+"+token);
+                jsObject.put("Message", token);
+            default:
+                jsObject.put("Token", "U0000");
         }
         result = jsObject.toJSONString();
         return result;
