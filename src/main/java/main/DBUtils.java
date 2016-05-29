@@ -35,7 +35,7 @@ public class DBUtils {
             ds = (DataSource) ctx.lookup("java:jboss/datasources/MySQLDS");
 
             //instance=new DBUtils();
-            Connection con = ds.getConnection("adminEAePkXJ", "qfbXnTFZ9pvr");
+            Connection con = ds.getConnection("adminrpIFmWj", "6XCs61ikDPyj");
             con.setAutoCommit(false);
             connections.add(con);
     //    }
