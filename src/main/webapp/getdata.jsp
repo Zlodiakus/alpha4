@@ -26,13 +26,13 @@ String PRace=request.getParameter("Race");
 if (PRace == null) PRace="0";
 int RACE=Integer.parseInt(PRace);
 check=false;
-//if (check) {
-//Player player=new Player(token, PLAT, PLNG);
-//result = player.sendData(ReqName,TGUID,LAT,LNG,RACE);
-//}
-//else {
+if (check) {
+Player player=new Player(token, PLAT, PLNG);
+result = player.sendData(ReqName,TGUID,LAT,LNG,RACE);
+}
+else {
 result="Check parameters";
-//}
+}
 //result="Технические работы на сервере."
 %>
 <%=result%>
