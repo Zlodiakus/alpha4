@@ -25,10 +25,11 @@ int LNG=Integer.parseInt(LngS);
 String PRace=request.getParameter("Race");
 if (PRace == null) PRace="0";
 int RACE=Integer.parseInt(PRace);
-check=false;
+int AMOUNT=0;
+//check=false;
 if (check) {
 Player player=new Player(token, PLAT, PLNG);
-result = player.sendData(ReqName,TGUID,LAT,LNG,RACE);
+result = player.sendData(ReqName,TGUID,LAT,LNG,RACE,AMOUNT);
 }
 else {
 result="Check parameters";
