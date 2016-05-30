@@ -145,7 +145,7 @@ public class City {
                 con.commit();
                 jresult.put("Result", "OK");
             } catch (SQLException e) {
-                jresult.put("Error", "Ошибка взаимодействия с базой данных при установке города");
+                jresult.put("Error", "Ошибка взаимодействия с базой данных при установке города.");
                     MyUtils.Logwrite("City.createCity", "PGUID=(" + PGUID + ")" + e.toString());
             }
         } else {
