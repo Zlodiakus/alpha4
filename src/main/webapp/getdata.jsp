@@ -3,7 +3,7 @@
     <%@page import="main.Player"%>
 <%
 //Boolean check=true;
-//String result;
+String result;
 //String token=request.getParameter("Token");
 //if (token == null) check=false;
 //String ReqName=request.getParameter("ReqName");
