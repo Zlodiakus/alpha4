@@ -215,6 +215,7 @@ public class Player {
     }
 
     public String getInvite(String Login, String Password) {
+        MyUtils.Logwrite("getInvite","Запрошен инвайт");
         PreparedStatement query;
         String Invite,ret;
         try {
