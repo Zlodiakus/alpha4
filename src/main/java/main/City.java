@@ -110,7 +110,7 @@ public class City {
 
                 int i=0;
                 Random random=new Random();
-                String [] upgrades = new String [6];
+                String [] upgrades = new String [7];
                     query=con.prepareStatement("select distinct Type from Upgrades");
                     ResultSet rs=query.executeQuery();
                     if (rs.isBeforeFirst()) {
@@ -126,7 +126,7 @@ public class City {
                 query = con.prepareStatement("INSERT INTO Cities (GUID,Name,UpgradeType, Creator) VALUES(?,?,?,?)");
                 query.setString(1, GUID);
                 query.setString(2, Generate.genCityName(con));
-                query.setString(3, upgrades[random.nextInt(6)]);
+                query.setString(3, upgrades[random.nextInt(7)]);
                 query.setString(4, PGUID);
                 query.execute();
                 query.close();
