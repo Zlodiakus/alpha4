@@ -65,7 +65,7 @@ public class City {
         int delta_lat2=(int)(1000000*Math.asin((180/3.1415926)*(625-mapper)/(6378137))); //это 375 минус апгрейд картографера метров
         int delta_lng2=(int)(1000000*Math.asin((180/3.1415926)*(625-mapper)/(6378137*Math.cos((LAT/1000000)*3.1415926/180)))); //и это 375 минус апгрейд картографера метров
         try {
-           query = con.prepareStatement("select z2.Name from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z2.PGUID=? and z1.Type='City' and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+?");
+           query = con.prepareStatement("select z2.Name from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z2.Creator=? and z1.Type='City' and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+?");
             query.setString(1,PGUID);
             query.setInt(2, LAT);
             query.setInt(3,delta_lat2);
