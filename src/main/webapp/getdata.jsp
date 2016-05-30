@@ -18,23 +18,17 @@ String PLngS=request.getParameter("plng");
 if (PLngS == null) PLngS="200";
 String TGUID=request.getParameter("TGUID");
 if (TGUID == null) TGUID="";
-//try {
 int PLAT=Integer.parseInt(PLatS);
 int PLNG=Integer.parseInt(PLngS);
 int LAT=Integer.parseInt(LatS);
 int LNG=Integer.parseInt(LngS);
-//} catch() {
-//check=false;
-//}
 String PRace=request.getParameter("Race");
 if (PRace == null) PRace="0";
 int RACE=Integer.parseInt(PRace);
-//check=false;
+check=false;
 if (check) {
 Player player=new Player(token, PLAT, PLNG);
-//String PGUID=player.getGUID();
 result = player.sendData(ReqName,TGUID,LAT,LNG,RACE);
-//result="OK";
 }
 else {
 result="Check parameters";
