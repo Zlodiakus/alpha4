@@ -84,6 +84,7 @@ public class Player {
 
     public Player(String Token, int PLAT, int PLNG) {
         //TODO: handle OldLat,OldLng/Lat,Lng
+        MyUtils.Logwrite("Player","создаем игрока для "+Token);
         int OldLat, OldLng;
         PreparedStatement query;
         ResultSet rs;
@@ -1237,6 +1238,7 @@ public class Player {
 
 
     public String sendData(String ReqName, String TGUID, int TLAT, int TLNG, int RACE, int AMOUNT) {
+        MyUtils.Logwrite("sendData","дошли");
         String result;
         switch (ReqName) {
             case "ScanRange":
@@ -1295,7 +1297,6 @@ public class Player {
     }
 
     private String createCity(int TLAT, int TLNG) {
-        int TTS, Radius, Life;
         String res, CGUID;
         MyUtils.Logwrite("createCity","Started by "+Name, r.freeMemory());
         if (MyUtils.RangeCheck(Lat, Lng, TLAT, TLNG) <= getRadius()) {
