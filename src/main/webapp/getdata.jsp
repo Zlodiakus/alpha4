@@ -2,7 +2,7 @@
     pageEncoding="UTF8"%>
     <%@page import="main.Player"%>
 <%
-Boolean check=true;
+//Boolean check=true;
 //String result;
 //String token=request.getParameter("Token");
 //if (token == null) check=false;
@@ -25,14 +25,14 @@ Boolean check=true;
 //String PRace=request.getParameter("Race");
 //if (PRace == null) PRace="0";
 //int RACE=Integer.parseInt(PRace);
-check=false;
-if (check) {
-Player player=new Player(token, PLAT, PLNG);
-result = player.sendData(ReqName,TGUID,LAT,LNG,RACE);
-}
-else {
+//check=false;
+//if (check) {
+//Player player=new Player(token, PLAT, PLNG);
+//result = player.sendData(ReqName,TGUID,LAT,LNG,RACE);
+//}
+//else {
 result="Check parameters";
-}
+//}
 //result="Технические работы на сервере."
 %>
 <%=result%>
