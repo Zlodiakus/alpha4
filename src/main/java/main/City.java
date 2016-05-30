@@ -74,7 +74,7 @@ public class City {
             query.setInt(6,delta_lng2);
             query.setInt(7,delta_lng2);
             rs = query.executeQuery();
-            if (rs.isBeforeFirst()) {
+            if (rs.first()) {
                         result=false;
                     }
             rs.close();
@@ -88,7 +88,7 @@ public class City {
                 query.setInt(5,delta_lng);
                 query.setInt(6,delta_lng);
                 rs = query.executeQuery();
-                if (rs.isBeforeFirst()) {
+                if (rs.first()) {
                     result=false;
                 }
                 rs.close();
