@@ -5,15 +5,15 @@ import org.json.simple.JSONObject;
 
 import javax.naming.NamingException;
 //import javax.resource.cci.ResultSet;
-import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
+
+
 
 /**
  * Created by Well on 17.01.2016.
@@ -34,6 +34,7 @@ public class Player {
     String result = "";
     Connection con = null;
     Runtime r = Runtime.getRuntime();
+
 
     public Player (String PGUID) {
         GUID=PGUID;
