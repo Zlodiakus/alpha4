@@ -2,10 +2,10 @@
     pageEncoding="UTF8"%>
     <%@page import="main.Player"%>
 <%
-//Boolean check=true;
+Boolean check=true;
 String result;
-//String token=request.getParameter("Token");
-//if (token == null) check=false;
+String token=request.getParameter("Token");
+if (token == null) check=false;
 //String ReqName=request.getParameter("ReqName");
 //if (ReqName == null) check=false;
 //String LatS=request.getParameter("lat");
