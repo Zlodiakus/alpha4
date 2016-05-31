@@ -103,7 +103,8 @@ public class City {
 
     public String createCity(String PGUID, int TLAT, int TLNG) {
         PreparedStatement query;
-        int LAT, LNG, rand, mapper=0;
+        String CName, CUpgradeType,CUName;
+        int LAT, LNG, rand, r, dist, mapper=0;
         JSONObject jresult = new JSONObject();
         if (canCreateCity(PGUID, TLAT, TLNG, mapper, con)) {
             try {
@@ -111,12 +112,14 @@ public class City {
                 int i=0;
                 Random random=new Random();
                 String [] upgrades = new String [7];
-                    query=con.prepareStatement("select distinct Type from Upgrades");
+                String [] upnames = new String [7];
+                    query=con.prepareStatement("select Type,Name from Upgrades where level=0");
                     ResultSet rs=query.executeQuery();
                     if (rs.isBeforeFirst()) {
                         while (rs.next()) {
                             i=i+1;
-                            upgrades[i-1]=rs.getString(1);
+                            upgrades[i-1]=rs.getString("Type");
+                            upnames[i-1]=rs.getString("Name");
                         }
                         query.close();
                         rs.close();
@@ -125,8 +128,12 @@ public class City {
 
                 query = con.prepareStatement("INSERT INTO Cities (GUID,Name,UpgradeType, Creator) VALUES(?,?,?,?)");
                 query.setString(1, GUID);
-                query.setString(2, Generate.genCityName(con));
-                query.setString(3, upgrades[random.nextInt(7)]);
+                CName=Generate.genCityName(con);
+                query.setString(2, CName);
+                r=random.nextInt(7);
+                CUpgradeType=upgrades[r];
+                CUName=upnames[r];
+                query.setString(3, CUpgradeType);
                 query.setString(4, PGUID);
                 query.execute();
                 query.close();
@@ -144,13 +151,31 @@ public class City {
                 query.close();
                 con.commit();
                 jresult.put("Result", "OK");
+                jresult.put("GUID", GUID);
+                jresult.put("Type", "City");
+                jresult.put("Lat", LAT);
+                jresult.put("Lng", LNG);
+                jresult.put("Name", CName);
+                jresult.put("Level", 1);
+                jresult.put("Progress",0);
+                jresult.put("UpgradeType",CUpgradeType);
+                jresult.put("UpgradeName",CUName);
+                jresult.put("Radius",100);
+                jresult.put("Influence1",0);
+                jresult.put("Influence2",0);
+                jresult.put("Influence3",0);
+                jresult.put("Owner",true);
+                dist=(int)MyUtils.RangeCheck(LAT,LNG,TLAT,TLNG);
+                jresult.put("Message","Город успешно основан в "+dist+" метрах от запланированного места");
             } catch (SQLException e) {
-                jresult.put("Error", "Ошибка взаимодействия с базой данных при установке города.");
+                jresult.put("Result","BD001");
+                jresult.put("Message", "Ошибка взаимодействия с базой данных при установке города.");
                     MyUtils.Logwrite("City.createCity", "PGUID=(" + PGUID + ")" + e.toString());
             }
         } else {
             //jresult.put("Error", "Can't set ambush here. City or another ambush is too close.");
-            jresult.put("Error", "Невозможно основать город здесь. Другой город слишком близко!");
+            jresult.put("Result","O1202");
+            jresult.put("Message", "Невозможно основать город здесь. Другой город слишком близко!");
         }
 
 

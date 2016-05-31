@@ -1311,10 +1311,12 @@ public class Player {
                 City city = new City(CGUID, con);
                 res = city.createCity(GUID, TLAT, TLNG);
             } else {
-                jresult.put("Error", "Достигнут лимит основанных городов!");
+                jresult.put("Result","O1203");
+                jresult.put("Message", "Достигнут лимит основанных городов!");
                 res=jresult.toString();
             }
         } else {
+            jresult.put("Result","O1201");
             jresult.put("Error", "Слишком далеко!");
             res=jresult.toString();
         }
