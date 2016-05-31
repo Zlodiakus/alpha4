@@ -131,7 +131,7 @@ public class City {
                 query.execute();
                 query.close();
 
-                query = con.prepareStatement("INSERT INTO GameObjects(GUID,Lat,Lng,Type)VALUES(?,?,?,'city')");
+                query = con.prepareStatement("INSERT INTO GameObjects(GUID,Lat,Lng,Type)VALUES(?,?,?,'City')");
                 query.setString(1, GUID);
                     rand=(int)(Math.random()*2*(125-mapper))-(125-mapper);
                     int delta_lat_rand=(int)(1000000*Math.asin((180/3.1415926)*(rand)/(6378137)));
