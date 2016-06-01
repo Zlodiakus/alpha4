@@ -238,7 +238,7 @@ public class Ambush {
         Player player=new Player(PGUID,con);
         player.getGold(bonus);
         player.addStat("ambushed",bonus);
-        MyUtils.Message(PGUID,"Чей-то караван попался в вашу засаду "+Name+"! Добыча составила "+Integer.toString(bonus)+" монет!",0,0,Lat,Lng);
+        MyUtils.Message(PGUID,"Чей-то караван попался в вашу засаду "+Name+"! Добыча составила "+Integer.toString(bonus)+" монет!",3,0,Lat,Lng);
         Life-=1;
         if (Life<=0) {
             delete(con);

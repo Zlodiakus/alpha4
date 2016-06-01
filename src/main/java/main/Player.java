@@ -965,7 +965,7 @@ public class Player {
                     jobj.put("Message","Награда за уничтожение засады составила "+Integer.toString(bonus)+" золота!");
                     getGold(bonus);
                     addStat("paladined",bonus);
-                    MyUtils.Message(ambush.PGUID, "Ваша засада " + ambush.Name + " была уничтожена!", 0, 0, ambush.Lat, ambush.Lng);
+                    MyUtils.Message(ambush.PGUID, "Ваша засада " + ambush.Name + " была уничтожена!", 2, 0, ambush.Lat, ambush.Lng);
                     res = jobj.toString();
                 }
             } else {

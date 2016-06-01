@@ -172,9 +172,9 @@ public class Caravan {
             query.close();
             con.commit();
             if (APGUID.equals("Elf"))
-                MyUtils.Message(PGUID, "Твой караван, идущий из " + StartName + " в " + FinishName + ", попал в эльфийскую засаду! ", 0,0,Lat,Lng);
+                MyUtils.Message(PGUID, "Твой караван, идущий из " + StartName + " в " + FinishName + ", попал в эльфийскую засаду! ", 1,0,Lat,Lng);
             else
-                MyUtils.Message(PGUID, "Твой караван, идущий из " + StartName + " в " + FinishName + ", попал в засаду!", 0,0,Lat,Lng);
+                MyUtils.Message(PGUID, "Твой караван, идущий из " + StartName + " в " + FinishName + ", попал в засаду!", 1,0,Lat,Lng);
         } catch (SQLException e) {
             MyUtils.Logwrite("Caravan.checkAmbushes", "Error while removing caravan GUID=" + GUID+ "from base: " +e.toString());
         }
