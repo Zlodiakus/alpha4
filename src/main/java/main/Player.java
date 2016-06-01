@@ -1299,17 +1299,20 @@ public class Player {
     }
 
     private String hirePeople(String TGUID, int AMOUNT) {
-        return "OK";
+        jresult.put("Result", "OK");
+        return jresult.toString();
     }
 
     private String createCity(int TLAT, int TLNG) {
         String res, CGUID;
+        int mapper;
         MyUtils.Logwrite("createCity","Started by "+Name, r.freeMemory());
         if (MyUtils.RangeCheck(Lat, Lng, TLAT, TLNG) <= getRadius()) {
             if (CheckCitiesQuantity()) {
                 CGUID=UUID.randomUUID().toString();
                 City city = new City(CGUID, con);
-                res = city.createCity(GUID, TLAT, TLNG);
+                mapper=getPlayerUpgradeEffect2("founder");
+                res = city.createCity(GUID, TLAT, TLNG, mapper);
             } else {
                 jresult.put("Result","O1203");
                 jresult.put("Message", "Достигнут лимит основанных городов!");

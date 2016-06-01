@@ -58,21 +58,16 @@ public class City {
         ResultSet rs;
         String CName, minName="в чистом поле";
         int TLat,TLng, TRadius, CLevel;
-        double minDist=10000, curDist;
+        int minDist=250+mapper;
+        int minSelfDist=500+mapper;
         boolean result=true;
-        int delta_lat=(int)(1000000*Math.asin((180/3.1415926)*(375-mapper)/(6378137))); //это 375 минус апгрейд картографера метров
-        int delta_lng=(int)(1000000*Math.asin((180/3.1415926)*(375-mapper)/(6378137*Math.cos((LAT/1000000)*3.1415926/180)))); //и это 375 минус апгрейд картографера метров
-        int delta_lat2=(int)(1000000*Math.asin((180/3.1415926)*(625-mapper)/(6378137))); //это 375 минус апгрейд картографера метров
-        int delta_lng2=(int)(1000000*Math.asin((180/3.1415926)*(625-mapper)/(6378137*Math.cos((LAT/1000000)*3.1415926/180)))); //и это 375 минус апгрейд картографера метров
         try {
-           query = con.prepareStatement("select z2.Name from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z2.Creator=? and z1.Type='City' and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+?");
+            query = con.prepareStatement("select z2.Name,z1.Lat,z1.Lng,z2.Creator from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z1.Type='City' and z2.Creator=? and round(6378137 * acos(cos(z1.Lat / 1e6 * PI() / 180) * cos(? / 1e6 * PI() / 180) * cos(z1.Lng / 1e6 * PI() / 180 - ? / 1e6 * PI() / 180) + sin(z1.Lat / 1e6 * PI() / 180) * sin(? / 1e6 * PI() / 180)))<=?");
             query.setString(1,PGUID);
             query.setInt(2, LAT);
-            query.setInt(3,delta_lat2);
-            query.setInt(4,delta_lat2);
-            query.setInt(5, LNG);
-            query.setInt(6,delta_lng2);
-            query.setInt(7,delta_lng2);
+            query.setInt(3, LNG);
+            query.setInt(4, LAT);
+            query.setInt(5,minSelfDist);
             rs = query.executeQuery();
             if (rs.first()) {
                         result=false;
@@ -80,13 +75,11 @@ public class City {
             rs.close();
             query.close();
             if (result) {
-                query = con.prepareStatement("select z2.Name from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z1.Type='City' and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+?");
+                query = con.prepareStatement("select z2.Name,z1.Lat,z1.Lng,z2.Creator from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z1.Type='City' and round(6378137 * acos(cos(z1.Lat / 1e6 * PI() / 180) * cos(? / 1e6 * PI() / 180) * cos(z1.Lng / 1e6 * PI() / 180 - ? / 1e6 * PI() / 180) + sin(z1.Lat / 1e6 * PI() / 180) * sin(? / 1e6 * PI() / 180)))<=?");
                 query.setInt(1, LAT);
-                query.setInt(2,delta_lat);
-                query.setInt(3,delta_lat);
-                query.setInt(4, LNG);
-                query.setInt(5,delta_lng);
-                query.setInt(6,delta_lng);
+                query.setInt(2, LNG);
+                query.setInt(3, LAT);
+                query.setInt(4,minDist);
                 rs = query.executeQuery();
                 if (rs.first()) {
                     result=false;
@@ -101,10 +94,11 @@ public class City {
         return result;
     }
 
-    public String createCity(String PGUID, int TLAT, int TLNG) {
+    public String createCity(String PGUID, int TLAT, int TLNG, int mapper) {
         PreparedStatement query;
         String CName, CUpgradeType,CUName;
-        int LAT, LNG, rand, r, dist, mapper=0;
+        int LAT, LNG, r, dist;
+        int randLat,randLng,maxRandLng;
         JSONObject jresult = new JSONObject();
         if (canCreateCity(PGUID, TLAT, TLNG, mapper, con)) {
             try {
@@ -140,11 +134,13 @@ public class City {
 
                 query = con.prepareStatement("INSERT INTO GameObjects(GUID,Lat,Lng,Type)VALUES(?,?,?,'City')");
                 query.setString(1, GUID);
-                    rand=(int)(Math.random()*2*(125-mapper))-(125-mapper);
-                    int delta_lat_rand=(int)(1000000*Math.asin((180/3.1415926)*(rand)/(6378137)));
-                    int delta_lng_rand=(int)(1000000*Math.asin((180/3.1415926)*(rand)/(6378137*Math.cos((TLAT/1000000)*3.1415926/180))));
-                    LAT=TLAT+delta_lat_rand;
-                    LNG=TLNG+delta_lng_rand;
+                randLat=(int)(Math.random()*2*mapper)-mapper;
+                maxRandLng=(int)Math.sqrt(mapper*mapper-randLat*randLat);
+                randLng=(int) (Math.random()*2*maxRandLng)-maxRandLng;
+                int delta_lat_rand=(int)(1000000*Math.asin((180/3.1415926)*(randLat)/(6378137)));
+                int delta_lng_rand=(int)(1000000*Math.asin((180/3.1415926)*(randLng)/(6378137*Math.cos((TLAT/1000000)*3.1415926/180))));
+                LAT=TLAT+delta_lat_rand;
+                LNG=TLNG+delta_lng_rand;
                 query.setInt(2, LAT);
                 query.setInt(3, LNG);
                 query.execute();
