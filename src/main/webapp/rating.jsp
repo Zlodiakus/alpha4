@@ -18,8 +18,8 @@ String token=Rating.getFullRate();
             <th>№</th>
             <th>Имя</th>
             <th>Уровень</th>
-            <th>Золото</th>
             <th>Опыт</th>
+            <th>Золото</th>
             <th>Корованов</th>
             <th>Доход<br>в час</th>
             <th>Награблено</th>
