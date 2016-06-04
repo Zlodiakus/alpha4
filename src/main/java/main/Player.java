@@ -1042,12 +1042,14 @@ public class Player {
         if (checkRangeToObj(TGUID)) {
             checkUnfinishedRoute=getUnfinishedRoute();
             if (checkUnfinishedRoute.equals("No route")) {
-                jresult.put("Error", "Сначала начните маршрут!");
+                jresult.put("Result","O0603");
+                jresult.put("Message", "Сначала начните маршрут!");
                 res=jresult.toString();
             }
             else {
                 if (checkUnfinishedRoute.equals("Error")) {
-                    jresult.put("Error", "Error in getUnfinishedRoute()");
+                    jresult.put("Result","BD001");
+                    jresult.put("Message", "Ошибка обращения к БД");
                     res=jresult.toString();
                 }
                 else {
@@ -1060,14 +1062,16 @@ public class Player {
                         res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
                     }
                     else {
-                        jresult.put("Error","Такой маршрут уже существует, вы не можете создать два одинаковых маршрута!");
+                        jresult.put("Result","O0604");
+                        jresult.put("Message","Такой маршрут уже существует, вы не можете создать два одинаковых маршрута!");
                         res=jresult.toString();
                     }
                 }
             }
         }
         else {
-            jresult.put("Error", "Город слишком далеко.");
+            jresult.put("Result","O0602");
+            jresult.put("Message", "Город слишком далеко.");
             res=jresult.toString();
         }
         MyUtils.Logwrite("FinishRoute","Finished by "+Name, r.freeMemory());

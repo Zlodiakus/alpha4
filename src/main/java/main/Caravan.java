@@ -288,6 +288,7 @@ public class Caravan {
     }
 
     public String FinishRoute(String RGUID, String CGUID, int speed, int accel, int cargo, Connection con) {
+        JSONObject jobj = new JSONObject();
         PreparedStatement query;
         int levelS,levelF;
         double t,t1,t2,s1;
@@ -307,24 +308,26 @@ public class Caravan {
             LngS=rs.getInt("Lng");
             Start=rs.getString("Start");
 
-            if ((LatS==Lat) && (LngS==Lng)) {jresult.put("Error","Ваш маршрут начинается в этом городе, вы не можете завершить маршрут в нем!");return jresult.toString();}
+            if ((LatS==Lat) && (LngS==Lng)) {jresult.put("Result","O0605");jresult.put("Message","Ваш маршрут начинается в этом городе, вы не можете завершить маршрут в нем!");return jresult.toString();}
             query=con.prepareStatement("insert into GameObjects (GUID,Lat,Lng,Type) values (?,?,?,'Caravan')");
             query.setString(1,RGUID);
             query.setInt(2,LatS);
             query.setInt(3,LngS);
             query.execute();
 
-            query=con.prepareStatement("select Level from Cities where GUID=?");
+            query=con.prepareStatement("select Level, Name from Cities where GUID=?");
             query.setString(1,Start);
             rs=query.executeQuery();
             rs.first();
             levelS=rs.getInt("Level");
+            StartName=rs.getString("Name");
 
-            query=con.prepareStatement("select Level from Cities where GUID=?");
+            query=con.prepareStatement("select Level, Name from Cities where GUID=?");
             query.setString(1,CGUID);
             rs=query.executeQuery();
             rs.first();
             levelF=rs.getInt("Level");
+            FinishName=rs.getString("Name");
 
             Distance=(int)MyUtils.distVincenty(LatS,LngS,Lat,Lng);
             bonus=(int)((Math.sqrt(levelS*levelF)*Distance*cargo)/1000);
@@ -343,8 +346,22 @@ public class Caravan {
             con.commit();
 //            rs.close();
             query.close();
-        } catch (SQLException e) {MyUtils.Logwrite("Caravan.FinishRoute",e.toString());jresult.put("Error",e.toString()); return jresult.toString();}
+        } catch (SQLException e) {MyUtils.Logwrite("Caravan.FinishRoute",e.toString());jresult.put("Result","BD001");jresult.put("Message","Ошибка обращения к БД"); return jresult.toString();}
         jresult.put("Result","OK");
+        jobj.put("GUID", RGUID);
+        jobj.put("Lat",Lat);
+        jobj.put("Lng",Lng);
+        jobj.put("StartGUID", Start);
+        jobj.put("StartName", StartName);
+        jobj.put("FinishGUID", CGUID);
+        jobj.put("FinishName", FinishName);
+        jobj.put("Distance", Distance);
+        jobj.put("profit", profit);
+        jobj.put("StartLat",LatS);
+        jobj.put("StartLng",LngS);
+        jobj.put("FinishLat",Lat);
+        jobj.put("FinishLng",Lng);
+        jresult.put("Route",jobj);
         return jresult.toString();
     }
 
