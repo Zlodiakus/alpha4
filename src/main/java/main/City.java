@@ -121,6 +121,7 @@ public class City {
         int LAT, LNG, r, dist;
         int randLat,randLng,maxRandLng;
         JSONObject jresult = new JSONObject();
+        JSONObject jobj = new JSONObject();
         if (canCreateCity(PGUID, TLAT, TLNG, mapper, con)) {
             try {
 
@@ -168,20 +169,22 @@ public class City {
                 query.close();
                 con.commit();
                 jresult.put("Result", "OK");
-                jresult.put("GUID", GUID);
-                jresult.put("Type", "City");
-                jresult.put("Lat", LAT);
-                jresult.put("Lng", LNG);
-                jresult.put("Name", CName);
-                jresult.put("Level", 1);
-                jresult.put("Progress",0);
-                jresult.put("UpgradeType",CUpgradeType);
-                jresult.put("UpgradeName",CUName);
-                jresult.put("Radius",100);
-                jresult.put("Influence1",0);
-                jresult.put("Influence2",0);
-                jresult.put("Influence3",0);
-                jresult.put("Owner",true);
+                jobj.put("GUID", GUID);
+                jobj.put("Type", "City");
+                jobj.put("Lat", LAT);
+                jobj.put("Lng", LNG);
+                jobj.put("Name", CName);
+                jobj.put("Level", 1);
+                jobj.put("Progress",0);
+                jobj.put("UpgradeType",CUpgradeType);
+                jobj.put("UpgradeName",CUName);
+                jobj.put("Radius",100);
+                jobj.put("Influence1",0);
+                jobj.put("Influence2",0);
+                jobj.put("Influence3",0);
+                jobj.put("Owner",true);
+                jobj.put("Hirelings",100);
+                jresult.put("City",jobj);
                 dist=(int)MyUtils.RangeCheck(LAT,LNG,TLAT,TLNG);
                 jresult.put("Message","Город успешно основан в "+dist+" метрах от запланированного места");
             } catch (SQLException e) {

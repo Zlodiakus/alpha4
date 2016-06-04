@@ -68,6 +68,7 @@ public class Ambush {
         PreparedStatement query;
         String AGUID;
         JSONObject jresult = new JSONObject();
+        JSONObject jobj = new JSONObject();
                 if (canSetAmbush(LAT, LNG, con)) {
                     AGUID = UUID.randomUUID().toString();
                     try {
@@ -89,6 +90,16 @@ public class Ambush {
                         query.close();
                         con.commit();
                         jresult.put("Result", "OK");
+                        jobj.put("GUID", AGUID);
+                        jobj.put("Type", "Ambush");
+                        jobj.put("Lat", LAT);
+                        jobj.put("Lng", LNG);
+                        jobj.put("Owner", 0);
+                        jobj.put("Radius", radius);
+                        jobj.put("Ready", TTS);
+                        jobj.put("Name",Name);
+                        jobj.put("Life",Life);
+                        jresult.put("Ambush",jobj);
                     } catch (SQLException e) {
                         jresult.put("Result", "DB001");
                         jresult.put("Message", "DBError in SetAmbush: PGUID=(" + PGUID + ")" + e.toString() + Arrays.toString(e.getStackTrace()));
@@ -167,7 +178,7 @@ public class Ambush {
         GUID=AGUID;
         result=delete(con);
         if (result.equals("OK")) {jresult.put("Result","OK");}
-             else {jresult.put("Error",result);}
+             else {jresult.put("Result","DB001");jresult.put("Message",result);}
         return jresult.toString();
     }
 

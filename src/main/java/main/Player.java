@@ -266,19 +266,7 @@ public class Player {
         if (checkForLevel()) {
             Level += 1;
         }
-        try {
-            query = con.prepareStatement("update Players set Exp=?,Gold=?,Level=? where GUID=?");
-            query.setInt(1, Exp);
-            query.setInt(2, Gold);
-            query.setInt(3, Level);
-            query.setString(4, GUID);
-            query.execute();
-            query.close();
-            con.commit();
-            //MyUtils.Logwrite("Player.getGold","Grats with "+GOLD+" gold, "+Name+"!");
-        } catch (SQLException e) {
-            MyUtils.Logwrite("Player.getGold","Oops, no coins "+e.toString());
-        }
+        update();
         Fraction fraction = new Fraction(Race,con);
         fraction.getGold(GOLD,con);
     }
@@ -291,19 +279,21 @@ public class Player {
     public void update() {
         PreparedStatement query;
         try {
-            query = con.prepareStatement("update Players set Level=?, Exp=?, Gold=?, Race=? where GUID=?");
+            query = con.prepareStatement("update Players set Level=?, Exp=?, Gold=?, Race=?, Hirelings=? where GUID=?");
             query.setInt(1,Level);
             query.setInt(2,Exp);
             query.setInt(3,Gold);
             query.setInt(4,Race);
-            query.setString(5,GUID);
+            query.setInt(5,Hirelings);
+            query.setString(6,GUID);
             query.execute();
             con.commit();
             query.close();
             jresult.put("Result","OK");
         } catch (SQLException e) {
             MyUtils.Logwrite("Player.update","Failed player "+Name+" update. SQL Error: "+e.toString());
-            jresult.put("Error","Ошибка обновления данных игрока: "+e.toString());
+            jresult.put("Result","DB001");
+            jresult.put("Message","Ошибка обновления данных игрока: "+e.toString());
         }
     }
 
@@ -642,7 +632,7 @@ public class Player {
         PreparedStatement query, query2;
         ResultSet rs;
         String TPGUID, CName, CUpgradeType, Start, Finish, StartName, FinishName, CUName, TName;
-        int CLevel, TRadius, TTTS, CRadius, StartLat, StartLng, FinishLat, FinishLng, Speed, progress,COwner,AOwner;
+        int CLevel, TRadius, TTTS, CRadius, StartLat, StartLng, FinishLat, FinishLng, Speed, progress,COwner,AOwner, TLife;
         MyUtils.Logwrite("ScanRange","Started by "+Name,r.freeMemory());
         String TGUID, Type, TLat, TLng, Result;
         long CExp, NExp, TExp, Inf1, Inf2, Inf3;
@@ -698,7 +688,7 @@ public class Player {
             }
 
             //Засады
-            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.PGUID,z2.Radius,z2.TTS,z2.Name,z3.Race from GameObjects z1, Ambushes z2, Players z3 where z3.GUID=z2.PGUID and z2.GUID=z1.GUID and ? between z1.Lat-10000 and z1.Lat+10000 and ? between z1.Lng-10000 and z1.Lng+10000");
+            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.PGUID,z2.Radius,z2.TTS,z2.Name,z3.Race,z2.Life from GameObjects z1, Ambushes z2, Players z3 where z3.GUID=z2.PGUID and z2.GUID=z1.GUID and ? between z1.Lat-10000 and z1.Lat+10000 and ? between z1.Lng-10000 and z1.Lng+10000");
             query.setInt(1, Lat);
             query.setInt(2, Lng);
             rs = query.executeQuery();
@@ -713,6 +703,7 @@ public class Player {
                     TRadius = rs.getInt("Radius");
                     TTTS = rs.getInt("TTS");
                     TName = rs.getString("Name");
+                    TLife=rs.getInt("Life");
                     if (TPGUID.equals(GUID)) AOwner=0;
                     else AOwner=rs.getInt("Race");
                     jobj.put("GUID", TGUID);
@@ -723,6 +714,7 @@ public class Player {
                     jobj.put("Radius", TRadius);
                     jobj.put("Ready", TTTS);
                     jobj.put("Name",TName);
+                    jobj.put("Life",TLife);
                     jarr.add(jobj);
                 }
             }
@@ -917,7 +909,7 @@ public class Player {
                 TTS=getPlayerUpgradeEffect2("set_ambushes");
                 Radius=getPlayerUpgradeEffect1("ambushes");
                 Life=getPlayerUpgradeEffect2("ambushes");
-                if (Hirelings<10*Life) {jresult.put("Result", "O0203");jresult.put("Message","Вам не хватает наемников для установки засады!");res=jresult.toString();}
+                if (Hirelings<10*Life) {jresult.put("Result", "O0204");jresult.put("Message","Вам не хватает наемников для установки засады!");res=jresult.toString();}
                 else {
                     Ambush ambush = new Ambush();
                     res = ambush.Set(GUID, TLAT, TLNG, Radius, -TTS, Life, false, con);
@@ -925,7 +917,7 @@ public class Player {
                     update();
                 }
             } else {
-                jresult.put("Result", "O0204");jresult.put("Message","Все засады уже установлены!");
+                jresult.put("Result", "O0203");jresult.put("Message","Все засады уже установлены!");
                 res=jresult.toString();
             }
         } else {
@@ -936,51 +928,44 @@ public class Player {
         return res;
     }
 
- /*   private String getAmbushOwner(String TGUID) {
-        PreparedStatement query;
-        ResultSet rs;
-        String OwnerGUID="";
-        try {
-            query= con.prepareStatement("select PGUID from Ambushes where GUID=?");
-            query.setString(1,TGUID);
-            rs = query.executeQuery();
-            if (rs.isBeforeFirst()) {
-                rs.first();
-                OwnerGUID=rs.getString("PGUID");
-            }
-            rs.close();
-            query.close();
-        } catch (SQLException e) {}
-        return OwnerGUID;
-    }
-*/
     public String DestroyAmbush(String TGUID) {
-        MyUtils.Logwrite("DestroyAmbush","Started by "+Name, r.freeMemory());
+        MyUtils.Logwrite("DestroyAmbush", "Started by " + Name, r.freeMemory());
         String res;
         int bonus;
-        JSONObject jobj=new JSONObject();
-        Ambush ambush=new Ambush(TGUID, con);
-        if (ambush.Race==Race) {jresult.put("Error", "Нельзя уничтожать засады своей фракции!"); res=jresult.toString();}
-        else {
-                if (MyUtils.RangeCheck(ambush.Lat, ambush.Lng, Lat, Lng) <= getRadius()) {
-                res = ambush.Destroy(TGUID, con);
-                jobj.put("Result", "OK");
-                if (res.equals(jobj.toString())) {
-                    //bonus = 10 + getPlayerUpgradeEffect2("paladin");
-                    bonus=(20+Math.min(720,ambush.TTS+180)*ambush.Life)*getPlayerUpgradeEffect2("paladin")/20;
-                    jobj.put("Message","Награда за уничтожение засады составила "+Integer.toString(bonus)+" золота!");
-                    getGold(bonus);
-                    addStat("paladined",bonus);
-                    MyUtils.Message(ambush.PGUID, "Ваша засада " + ambush.Name + " была уничтожена!", 2, 0, ambush.Lat, ambush.Lng);
-                    res = jobj.toString();
+        JSONObject jobj = new JSONObject();
+        Ambush ambush = new Ambush(TGUID, con);
+        if (ambush.Race == Race) {
+            jresult.put("Result", "O0303");
+            jresult.put("Message", "Нельзя уничтожать засады своей фракции!");
+            res = jresult.toString();
+        } else {
+            if (MyUtils.RangeCheck(ambush.Lat, ambush.Lng, Lat, Lng) <= getRadius()) {
+                if (Hirelings < 5 * ambush.Life) {
+                    jresult.put("Result", "O0304");
+                    jresult.put("Message", "Вам не хватает наемников для уничтожения засады!");
+                    res = jresult.toString();
+                } else {
+                    res = ambush.Destroy(TGUID, con);
+                    jobj.put("Result", "OK");
+                    if (res.equals(jobj.toString())) {
+                        //bonus = 10 + getPlayerUpgradeEffect2("paladin");
+                        bonus = (20 + Math.min(720, ambush.TTS + 180) * ambush.Life) * getPlayerUpgradeEffect2("paladin") / 20;
+                        jobj.put("Message", "Награда за уничтожение засады составила " + Integer.toString(bonus) + " золота!");
+                        Hirelings -= 5 * ambush.Life; //апдейт в гетГолде пройдет
+                        getGold(bonus);
+                        addStat("paladined", bonus);
+                        MyUtils.Message(ambush.PGUID, "Ваша засада " + ambush.Name + " была уничтожена!", 2, 0, ambush.Lat, ambush.Lng);
+                        res = jobj.toString();
+                    }
                 }
             } else {
-                jresult.put("Error", "Засада слишком далеко!");
+                jresult.put("Result", "O0302");
+                jresult.put("Message", "Засада слишком далеко!");
                 res = jresult.toString();
             }
         }
-    MyUtils.Logwrite("DestroyAmbush","Finished by "+Name, r.freeMemory());
-    return res;
+        MyUtils.Logwrite("DestroyAmbush", "Finished by " + Name, r.freeMemory());
+        return res;
     }
 
     public String CancelAmbush(String TGUID) {
