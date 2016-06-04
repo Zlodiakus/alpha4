@@ -17,14 +17,14 @@ import java.util.UUID;
  */
 public class City {
     String GUID,UpgradeType,Name;
-    int Exp,Level, Influence1, Influence2, Influence3;
+    int Exp,Level, Influence1, Influence2, Influence3, Hirelings;
     Connection con;
     public City (String CGUID,Connection CON) {
         GUID=CGUID;
         con=CON;
         PreparedStatement query;
         try {
-            query = con.prepareStatement("select Name,Level,Exp,UpgradeType, Influence1, Influence2, Influence3 from Cities where GUID=?");
+            query = con.prepareStatement("select Name,Level,Exp,UpgradeType, Influence1, Influence2, Influence3, Hirelings from Cities where GUID=?");
             query.setString(1, GUID);
             ResultSet rs=query.executeQuery();
             rs.first();
@@ -35,6 +35,7 @@ public class City {
             Influence1=rs.getInt("Influence1");
             Influence2=rs.getInt("Influence2");
             Influence3=rs.getInt("Influence3");
+            Hirelings=rs.getInt("Hirelings");
             rs.close();
             query.close();
             //MyUtils.Logwrite("City","Object City "+GUID+" loaded");
@@ -44,12 +45,32 @@ public class City {
 
     }
 
-    public City (String CGUID, int CExp, int CLevel, String CName, Connection CON) {
+/*    public City (String CGUID, int CExp, int CLevel, String CName, Connection CON) {
         GUID=CGUID;
         Exp=CExp;
         Level=CLevel;
         Name=CName;
         con=CON;
+    }
+*/
+
+    public void update() {
+        PreparedStatement query;
+        try {
+            query = con.prepareStatement("update Cities set Exp=?,Level=?, Influence1=?, Influence2=?, Influence3=?, Hirelings=? where GUID=?");
+            query.setInt(1, Exp);
+            query.setInt(2, Level);
+            query.setInt(3, Influence1);
+            query.setInt(4, Influence2);
+            query.setInt(5, Influence3);
+            query.setInt(6, Hirelings);
+            query.setString(7, GUID);
+            query.execute();
+            query.close();
+            con.commit();
+        } catch (SQLException e) {
+            MyUtils.Logwrite("City.update","Failed city "+Name+" update. SQL Error: "+e.toString());
+        }
     }
 
     private boolean canCreateCity(String PGUID, int LAT, int LNG, int mapper, Connection con) {
@@ -278,7 +299,7 @@ public class City {
             TNL = rs.getInt(1);
             rs.close();
             query.close();
-        } catch (SQLException e) {TNL=99999999;}
+        } catch (SQLException e) {TNL=999999999;}
         return TNL;
     }
 

@@ -24,4 +24,13 @@ public class BackGround {
         MyUtils.Logwrite("BackGround","Finished");
 
     }
+    @Schedule(hour="*", minute="0", second="10", persistent=false)
+    public void WorldMoveHour() throws SQLException, NamingException {
+        MyUtils.Logwrite("BackGround.Hour","Started");
+        World world = new World();
+        world.moveHour();
+        world.close();
+        MyUtils.Logwrite("BackGround.Hour","Finished");
+
+    }
 }

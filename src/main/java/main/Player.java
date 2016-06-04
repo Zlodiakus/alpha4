@@ -29,6 +29,7 @@ public class Player {
     int Gold = 0;
     int Lat = 100;
     int Lng = 200;
+    int Hirelings;
     JSONObject jresult = new JSONObject();
     JSONArray jarr = new JSONArray();
     String result = "";
@@ -916,14 +917,19 @@ public class Player {
                 TTS=getPlayerUpgradeEffect2("set_ambushes");
                 Radius=getPlayerUpgradeEffect1("ambushes");
                 Life=getPlayerUpgradeEffect2("ambushes");
-                Ambush ambush = new Ambush();
-                res = ambush.Set(GUID, TLAT, TLNG, Radius, -TTS, Life, false, con);
+                if (Hirelings<10*Life) {jresult.put("Result", "O0203");jresult.put("Message","Вам не хватает наемников для установки засады!");res=jresult.toString();}
+                else {
+                    Ambush ambush = new Ambush();
+                    res = ambush.Set(GUID, TLAT, TLNG, Radius, -TTS, Life, false, con);
+                    Hirelings-=10*Life;
+                    update();
+                }
             } else {
-                jresult.put("Error", "Все засады уже установлены!");
+                jresult.put("Result", "O0204");jresult.put("Message","Все засады уже установлены!");
                 res=jresult.toString();
             }
         } else {
-            jresult.put("Error", "Засада слишком далеко!");
+            jresult.put("Result", "O0202"); jresult.put("Error", "Засада слишком далеко!");
             res=jresult.toString();
         }
         MyUtils.Logwrite("SetAmbush","Finished by "+Name, r.freeMemory());
@@ -1299,7 +1305,36 @@ public class Player {
     }
 
     private String hirePeople(String TGUID, int AMOUNT) {
-        jresult.put("Result", "OK");
+        int hireCost;
+        City city = new City(TGUID,con);
+        if (checkRangeToObj(TGUID)) {
+            jresult.put("Result", "O1302");
+            jresult.put("Message", "Город слишком далеко!");}
+        else {
+            if (city.Hirelings < AMOUNT) {
+                jresult.put("Result", "O1305");
+                jresult.put("Message", "В городе нет столько наемников!");
+            } else {
+                if (Hirelings + AMOUNT > getPlayerUpgradeEffect1("leadership")) {
+                    jresult.put("Result", "O1304");
+                    jresult.put("Message", "Вы пока не можете управлять таким количеством наемников!");
+                } else {
+                    hireCost = (int) (AMOUNT * (int) (100 * Math.sqrt(city.Level)) * (100 - getPlayerUpgradeEffect1("bargain")) / 100);
+                    if (Gold < hireCost) {
+                        jresult.put("Result", "O1303");
+                        jresult.put("Message", "Вам не хватает денег! Требуется " + hireCost + " золота!");
+                    } else {
+                        Gold -= hireCost;
+                        city.Hirelings -= AMOUNT;
+                        Hirelings += AMOUNT;
+                        city.update();
+                        update();
+                        jresult.put("Result", "OK");
+                        jresult.put("Message", "Вы успешно наняли " + AMOUNT + " наемников");
+                    }
+                }
+            }
+        }
         return jresult.toString();
     }
 

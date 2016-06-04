@@ -90,12 +90,14 @@ public class Ambush {
                         con.commit();
                         jresult.put("Result", "OK");
                     } catch (SQLException e) {
-                        jresult.put("Error", "DBError in SetAmbush: PGUID=(" + PGUID + ")" + e.toString() + Arrays.toString(e.getStackTrace()));
+                        jresult.put("Result", "DB001");
+                        jresult.put("Message", "DBError in SetAmbush: PGUID=(" + PGUID + ")" + e.toString() + Arrays.toString(e.getStackTrace()));
                     }
                 }
                     else {
                     //jresult.put("Error", "Can't set ambush here. City or another ambush is too close.");
-                    jresult.put("Error","Невозможно установить засаду здесь. Город или другая засада слишком близко!");
+                    jresult.put("Result","O0201");
+                    jresult.put("Message","Невозможно установить засаду здесь. Город или другая засада слишком близко!");
                 }
 
 
