@@ -52,7 +52,7 @@ public class Authorize {
         //Получение параметров
         String googleToken=request.getParameter("GoogleToken");
         String hash=request.getParameter("hash");
-        String version=request.getParameter("Version");
+        String version=request.getParameter("version");
         //Проверка Версии
         if (!Version.checkVersion(version)) {
             JSONObject jsObject = (new JSONObject());
@@ -102,7 +102,7 @@ public class Authorize {
         String result;
         String googleToken=request.getParameter("GoogleToken");
         String hash=request.getParameter("hash");
-        String version=request.getParameter("Version");
+        String version=request.getParameter("version");
         String invite=request.getParameter("InviteCode");
         String userName=request.getParameter("UserName");
         //Проверка Версии
