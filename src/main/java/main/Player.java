@@ -30,6 +30,7 @@ public class Player {
     int Lat = 100;
     int Lng = 200;
     int Hirelings;
+    int HirelingsInAmbushes;
     JSONObject jresult = new JSONObject();
     JSONArray jarr = new JSONArray();
     String result = "";
@@ -102,7 +103,7 @@ public class Player {
         if (!result.equals("")) result = "No access to DB: " + result;
 
         try {
-            query = con.prepareStatement("select z1.GUID, z1.Name, z1.Level, z1.Exp, z1.Gold, z1.Race, z2.Lat, z2.Lng from Connections z0, Players z1, GameObjects z2 where z0.Token=? and z0.PGUID=z1.GUID and z2.GUID=z1.GUID");
+            query = con.prepareStatement("select z1.GUID, z1.Name, z1.Level, z1.Exp, z1.Gold, z1.Race, z2.Lat, z2.Lng, z1.Hirelings from Connections z0, Players z1, GameObjects z2 where z0.Token=? and z0.PGUID=z1.GUID and z2.GUID=z1.GUID");
             query.setString(1, Token);
             rs = query.executeQuery();
             if (rs.isBeforeFirst()) {
@@ -115,10 +116,19 @@ public class Player {
                 Race = rs.getInt("Race");
                 OldLat = rs.getInt("Lat");
                 OldLng = rs.getInt("Lng");
+                Hirelings = rs.getInt("Hirelings");
                 rs.close();
             } else {
                 LastError = MyUtils.getJSONError("NOUSERFOUND", "(" + Token + ")");
             }
+            query = con.prepareStatement("select 10*sum(Life) HirelingsInAmbushes from Ambushes where PGUID=?)");
+            query.setString(1,GUID);
+            if (rs.isBeforeFirst()) {
+                rs.first();
+                HirelingsInAmbushes = rs.getInt("HirelingsInAmbushes");
+            }
+            else {HirelingsInAmbushes=0;}
+
             query.close();
         } catch (SQLException e) {
             LastError = MyUtils.getJSONError("DBError", e.toString() + "\n" + Arrays.toString(e.getStackTrace()));
@@ -363,14 +373,18 @@ public class Player {
             City city = new City(CGUID, con);
             Upgrade currentUpgrade = new Upgrade(GUID, CGUID, con);
             if (currentUpgrade.GUID.equals("0")) {
-                jresult.put("Error", "Техническая ошибка 20001, обратитесь в службу моральной поддержки!");
-                MyUtils.Logwrite("BuyUpgrade","Can't create object targetUpgrade " + currentUpgrade.result);
+                jresult.put("Result","BD001");
+                jresult.put("Message", "Ошибка обращения к БД");
+                //jresult.put("Error", "Техническая ошибка 20001, обратитесь в службу моральной поддержки!");
+                MyUtils.Logwrite("BuyUpgrade","Can't create object currentUpgrade " + currentUpgrade.result);
                 return jresult.toString();
             }
             Upgrade targetUpgrade = new Upgrade(currentUpgrade.Type, currentUpgrade.Level + 1, con);
             if (targetUpgrade.GUID.equals("0")) {
                 MyUtils.Logwrite("BuyUpgrade","Can't create object targetUpgrade " + targetUpgrade.result);
-                jresult.put("Error", "Техническая ошибка 20002, обратитесь в службу моральной поддержки!");
+                jresult.put("Result","BD001");
+                jresult.put("Message", "Ошибка обращения к БД");
+                //jresult.put("Error", "Техническая ошибка 20002, обратитесь в службу моральной поддержки!");
                 return jresult.toString();
             }
             if (Level >= targetUpgrade.ReqPlayerLev) {
@@ -391,24 +405,28 @@ public class Player {
                         update();
                         if (targetUpgrade.Type.equals("cargo")) {bonusUpgradeRecount(targetUpgrade.Effect1/currentUpgrade.Effect1);}
                         if (targetUpgrade.Type.equals("speed")) {profitUpgradeRecount(targetUpgrade.Effect1,targetUpgrade.Effect2);}
-                        city.getGold(upcost/10);
+                        city.getGold(upcost/5);
                         targetUpgrade.update(GUID, con);
                         jresult.put("Result","OK");
                         ret = jresult.toString();
                     } else {
-                        jresult.put("Error", "Тебе не хватает золота на покупку этого умения");
+                        jresult.put("Result","O0703");
+                        jresult.put("Message", "Вам не хватает золота на покупку этого умения");
                         ret = jresult.toString();
                     }
                 } else {
-                    jresult.put("Error", "Этот город слишком мал, в нем некому обучить тебя умению "+targetUpgrade.Level+" уровня. Требуемый уровень города - "+targetUpgrade.ReqCityLev);
+                    jresult.put("Result","O0704");
+                    jresult.put("Message", "Этот город слишком мал, в нем никто не может обучить умению "+targetUpgrade.Level+" уровня. Требуемый уровень города - "+targetUpgrade.ReqCityLev);
                     ret = jresult.toString();
                 }
             } else {
-                jresult.put("Error", "Твой уровень слишком мал для приобретения этого умения!");
+                jresult.put("Result","O0705");
+                jresult.put("Message", "Ваш уровень слишком мал для приобретения этого умения!");
                 ret = jresult.toString();
             }
         } else {
-            jresult.put("Error", "Ты слишком далеко.");
+            jresult.put("Result","O0702");
+            jresult.put("Message", "Город слишком далеко.");
             ret = jresult.toString();
         }
         MyUtils.Logwrite("BuyUpgrade","Finished by "+Name, r.freeMemory());
@@ -444,6 +462,8 @@ public class Player {
         jresult.put("Exp",Exp);
         jresult.put("Gold",Gold);
         jresult.put("Race",Race);
+        jresult.put("Hirelings",Hirelings);
+        //jresult.put("HirelingsInAmbushes",HirelingsInAmbushes);
         PreparedStatement query;
         try {
             TNL = getTNL() - Exp;
@@ -1307,17 +1327,18 @@ public class Player {
                 jresult.put("Result", "O1305");
                 jresult.put("Message", "В городе нет столько наемников!");
             } else {
-                if (Hirelings + AMOUNT > getPlayerUpgradeEffect1("leadership")) {
+                if (Hirelings + HirelingsInAmbushes + AMOUNT > getPlayerUpgradeEffect1("leadership")) {
                     jresult.put("Result", "O1304");
                     jresult.put("Message", "Вы пока не можете управлять таким количеством наемников!");
                 } else {
-                    hireCost = (int) (AMOUNT * (int) (100 * Math.sqrt(city.Level)) * (100 - getPlayerUpgradeEffect1("bargain")) / 100);
+                    hireCost = AMOUNT * (int) (100 * Math.sqrt(city.Level)) * (100 - getPlayerUpgradeEffect1("bargain")) / 100;
                     if (Gold < hireCost) {
                         jresult.put("Result", "O1303");
                         jresult.put("Message", "Вам не хватает денег! Требуется " + hireCost + " золота!");
                     } else {
                         Gold -= hireCost;
                         city.Hirelings -= AMOUNT;
+                        city.getGold(hireCost);
                         Hirelings += AMOUNT;
                         city.update();
                         update();
