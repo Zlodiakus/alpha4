@@ -714,7 +714,7 @@ public class Player {
                     jobj.put("Radius", TRadius);
                     jobj.put("Ready", TTTS);
                     jobj.put("Name",TName);
-                    jobj.put("Life",TLife);
+                    jobj.put("Life",TLife*10);
                     jarr.add(jobj);
                 }
             }
@@ -884,16 +884,19 @@ public class Player {
             }
             else {
                 if (checkUnfinishedRoute.equals("Error")) {
-                    jresult.put("Error", "Error in getUnfinishedRoute()");
+                    jresult.put("Result", "DB001");
+                    jresult.put("Message", "Ошибка обращения к БД");
                     res=jresult.toString();
                 }
                 else {
-                    jresult.put("Error", "У тебя уже есть незавершенный маршрут!");
+                    jresult.put("Result", "O0503");
+                    jresult.put("Message", "У тебя уже есть незавершенный маршрут!");
                     res=jresult.toString();
                 }
             }
         } else {
-            jresult.put("Error", "Город слишком далеко.");
+            jresult.put("Result", "O0502");
+            jresult.put("Message", "Город слишком далеко.");
             res=jresult.toString();
         }
         MyUtils.Logwrite("StartRoute","Finished by "+Name, r.freeMemory());
@@ -980,10 +983,10 @@ public class Player {
             if (rs.isBeforeFirst()){
             rs.first();
             OwnerGUID = rs.getString("PGUID");}
-            else {jresult.put("Error","Засада не найдена.");return jresult.toString();}
+            else {jresult.put("Result","O0401");jresult.put("Message","Засада не найдена.");return jresult.toString();}
             rs.close();
         }
-        catch (SQLException e) {jresult.put("Error","SQL Error:" +e.toString());return jresult.toString();}
+        catch (SQLException e) {jresult.put("Result","DB001");jresult.put("Message","Ошибка обращения к БД.");return jresult.toString();}
         if (GUID.equals(OwnerGUID)) {
             Ambush ambush=new Ambush();
             res=ambush.Destroy(TGUID,con);
@@ -992,7 +995,7 @@ public class Player {
                 MyUtils.Logwrite("Player.CancelAmbush","Ambush "+TGUID+" canceled by owner "+GUID);
             }
         } else {
-            jresult.put("Error", "You are not owner, cheater!");
+            jresult.put("Message", "You are not owner, cheater!");
             res=jresult.toString();
         }
         MyUtils.Logwrite("CancelAmbush","Started by "+Name, r.freeMemory());

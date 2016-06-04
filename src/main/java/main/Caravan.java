@@ -258,7 +258,9 @@ public class Caravan {
 
     public String StartRoute(String PGUID, String CGUID, Connection con) {
         String GUID= UUID.randomUUID().toString();
+        JSONObject jobj = new JSONObject();
         PreparedStatement query;
+        City city = new City(CGUID,con);
         try{
             query=con.prepareStatement("insert into Caravans (GUID,PGUID,Start,Speed) values (?,?,?,?) ");
             query.setString(1,GUID);
@@ -267,9 +269,21 @@ public class Caravan {
             query.setInt(4, 0);
             query.execute();
             con.commit();
+            query=con.prepareStatement("select Lat,Lng from GameObjects where GUID=?");
+            query.setString(1,CGUID);
+            ResultSet rs=query.executeQuery();
+            rs.first();
+            Lat=rs.getInt(1);
+            Lng=rs.getInt(2);
             query.close();
-        } catch (SQLException e) {jresult.put("Error",e.toString());return jresult.toString();}
+        } catch (SQLException e) {jresult.put("Result","DB001");jresult.put("Message","Ошибка обращения к БД.");return jresult.toString();}
         jresult.put("Result","OK");
+        jobj.put("GUID",GUID);
+        jobj.put("StartLat",Lat);
+        jobj.put("StartLng",Lng);
+        jobj.put("StartGUID",CGUID);
+        jobj.put("StartName",city.Name);
+        jresult.put("Route",jobj);
         return jresult.toString();
     }
 

@@ -98,7 +98,7 @@ public class Ambush {
                         jobj.put("Radius", radius);
                         jobj.put("Ready", TTS);
                         jobj.put("Name",Name);
-                        jobj.put("Life",Life);
+                        jobj.put("Life",Life*10);
                         jresult.put("Ambush",jobj);
                     } catch (SQLException e) {
                         jresult.put("Result", "DB001");
@@ -196,7 +196,9 @@ public class Ambush {
             con.commit();
             MyUtils.Logwrite("Ambush.delete","Ambush deleted GUID="+GUID);
             return "OK";
-        } catch (SQLException e) {MyUtils.Logwrite("Ambush.delete","Error while deleting ambush GUID="+GUID+". SQLERROR:"+e.toString());return e.toString();}
+        } catch (SQLException e) {
+            MyUtils.Logwrite("Ambush.delete","Error while deleting ambush GUID="+GUID+". SQLERROR:"+e.toString());return e.toString();
+        }
     }
 
     public String update(Connection con) {
