@@ -249,9 +249,16 @@ public class Ambush {
     }
 
     public void caravaned(int bonus) {
+        String CGUID;
         //PreparedStatement query;
         Player player=new Player(PGUID,con);
         player.getGold(bonus);
+        CGUID=player.getRandomCity();
+        if (CGUID.length()>0) {
+            City city = new City(CGUID,con);
+            city.getGold(bonus,player.Race);
+            MyUtils.Logwrite("Ambush.caravaned", "В городе "+city.Name+"("+ CGUID+") разбойники пропили " + bonus + " золота.");
+        }
         player.addStat("ambushed",bonus);
         MyUtils.Message(PGUID,"Чей-то караван попался в вашу засаду "+Name+"! Добыча составила "+Integer.toString(bonus)+" монет!",3,0,Lat,Lng);
         Life-=1;
@@ -263,8 +270,6 @@ public class Ambush {
             update(con);
         }
     }
-
-
 
 /*    public static void CheckCaravans(Connection con) {
         String aGUID,aPGUID,cGUID,cPGUID;

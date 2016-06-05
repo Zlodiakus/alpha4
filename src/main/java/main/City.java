@@ -326,6 +326,7 @@ public class City {
         PreparedStatement query;
         Exp += GOLD;
         if (checkForLevel()) {
+            bonusCityRecount((float)Math.sqrt((float)(Level+1)/Level));
             Level += 1;
         }
         try {

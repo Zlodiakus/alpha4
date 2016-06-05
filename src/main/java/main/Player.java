@@ -1409,6 +1409,25 @@ public class Player {
         return jresult.toString();
     }
 
+    public String getRandomCity() {
+        String CGUID;
+        int total,rand;
+        PreparedStatement query;
+        ResultSet rs;
+        try {
+            query = con.prepareStatement("select GUID from Cities where Creator=?");
+            query.setString(1,GUID);
+            rs=query.executeQuery();
+            rs.last();
+            total=rs.getRow();
+            Random random=new Random();
+            rand=1+random.nextInt(total);
+            rs.absolute(rand);
+            CGUID=rs.getString("GUID");
+        } catch (SQLException e) {MyUtils.Logwrite("PLayer.getRandomCity",e.toString());CGUID="";}
+        return CGUID;
+    }
+
     private String createCity(int TLAT, int TLNG) {
         String res, CGUID;
         int mapper;
