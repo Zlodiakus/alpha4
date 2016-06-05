@@ -66,7 +66,7 @@ public class Player {
         con = CON;
         GUID = PGUID;
         try {
-            query = con.prepareStatement("select Name, Level, Exp, Gold, Race from Players where GUID=?");
+            query = con.prepareStatement("select Name, Level, Exp, Gold, Race, Hirelings from Players where GUID=?");
             query.setString(1, GUID);
             ResultSet rs = query.executeQuery();
             if (rs.isBeforeFirst()) {
@@ -76,6 +76,7 @@ public class Player {
                 Exp = rs.getInt("Exp");
                 Gold = rs.getInt("Gold");
                 Race = rs.getInt("Race");
+                Hirelings = rs.getInt("Hirelings");
             } else {
                 MyUtils.Logwrite("Player","Player "+GUID+" not found");
             }
@@ -1121,7 +1122,7 @@ public class Player {
                         else {
                             Caravan caravan = new Caravan(con);
                             res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
-                            if (res.contains("OK")) {Hirelings-=2;}
+                            if (res.contains("OK")) {Hirelings-=2;update();}
                         }
                     }
                     else {
