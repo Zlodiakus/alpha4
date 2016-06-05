@@ -1045,7 +1045,7 @@ public class Player {
         }
         catch (SQLException e) {jresult.put("Result","DB001");jresult.put("Message","Ошибка обращения к БД.");return jresult.toString();}
         if (GUID.equals(OwnerGUID)) {
-            Ambush ambush=new Ambush();
+            Ambush ambush=new Ambush(TGUID,con);
             res=ambush.Destroy(TGUID,con);
             jobj.put("Result","OK");
             if (res.equals(jobj.toString())) {
