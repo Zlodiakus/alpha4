@@ -1306,7 +1306,7 @@ public class Player {
 
 
     public String sendData(String ReqName, String TGUID, int TLAT, int TLNG, int RACE, int AMOUNT) {
-        MyUtils.Logwrite("sendData","дошли");
+        //MyUtils.Logwrite("sendData","дошли");
         String result;
         switch (ReqName) {
             case "ScanRange":
@@ -1361,19 +1361,23 @@ public class Player {
     }
 
     private String hirePeople(String TGUID, int AMOUNT) {
+        MyUtils.Logwrite("hirePeople","Started by "+Name, r.freeMemory());
         int hireCost; float RaceBonus,RaceDiscount;
         City city = new City(TGUID,con);
         if (!checkRangeToObj(TGUID)) {
             jresult.put("Result", "O1302");
-            jresult.put("Message", "Город слишком далеко!");}
+            jresult.put("Message", "Город слишком далеко!");
+            MyUtils.Logwrite("hirePeople",Name+" Город слишком далеко!", r.freeMemory());}
         else {
             if (city.Hirelings < AMOUNT) {
                 jresult.put("Result", "O1305");
                 jresult.put("Message", "В городе нет столько наемников!");
+                MyUtils.Logwrite("hirePeople",Name+" В городе нет столько наемников!", r.freeMemory());
             } else {
                 if (Hirelings + HirelingsInAmbushes + AMOUNT > getPlayerUpgradeEffect1("leadership")) {
                     jresult.put("Result", "O1304");
                     jresult.put("Message", "Вы пока не можете управлять таким количеством наемников!");
+                    MyUtils.Logwrite("hirePeople",Name+" Вы пока не можете управлять таким количеством наемников!", r.freeMemory());
                 } else {
                     RaceBonus=0;
                     if (city.Influence1+city.Influence2+city.Influence3>0) {
@@ -1386,6 +1390,7 @@ public class Player {
                     if (Gold < hireCost) {
                         jresult.put("Result", "O1303");
                         jresult.put("Message", "Вам не хватает денег! Требуется " + hireCost + " золота!");
+                        MyUtils.Logwrite("hirePeople",Name+" Вам не хватает денег! Требуется " + hireCost + " золота!", r.freeMemory());
                     } else {
                         Gold -= hireCost;
                         city.Hirelings -= AMOUNT;
@@ -1395,10 +1400,12 @@ public class Player {
                         update();
                         jresult.put("Result", "OK");
                         jresult.put("Message", "Вы успешно наняли " + AMOUNT + " наемников");
+                        MyUtils.Logwrite("hirePeople",Name+" Вы успешно наняли " + AMOUNT + " наемников", r.freeMemory());
                     }
                 }
             }
         }
+        MyUtils.Logwrite("hirePeople","Finished by "+Name, r.freeMemory());
         return jresult.toString();
     }
 
