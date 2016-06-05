@@ -18,6 +18,8 @@ public class Version {
                 break;
             case "2.0.19a":code="COWBOW";
                 break;
+            case "3.0.0a":code="COWBOW";
+                break;
             default: return false;
         }
         String param="";
