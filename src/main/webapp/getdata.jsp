@@ -26,6 +26,7 @@ String PRace=request.getParameter("Race");
 if (PRace == null) PRace="0";
 int RACE=Integer.parseInt(PRace);
 String AMOUNTS=request.getParameter("Amount");
+if (AMOUNTS == null) AMOUNTS="0";
 int AMOUNT=Integer.parseInt(AMOUNTS);
 //check=false;
 if (check) {
