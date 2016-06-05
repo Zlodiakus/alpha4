@@ -88,7 +88,7 @@ public class Player {
 
     public Player(String Token, int PLAT, int PLNG) {
         //TODO: handle OldLat,OldLng/Lat,Lng
-        MyUtils.Logwrite("Player","создаем игрока для "+Token);
+        //MyUtils.Logwrite("Player","создаем игрока для "+Token);
         int OldLat, OldLng;
         PreparedStatement query;
         ResultSet rs;
