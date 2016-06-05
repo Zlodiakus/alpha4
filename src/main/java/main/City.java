@@ -127,8 +127,8 @@ public class City {
 
                 int i=0;
                 Random random=new Random();
-                String [] upgrades = new String [7];
-                String [] upnames = new String [7];
+                String [] upgrades = new String [8];
+                String [] upnames = new String [8];
                     query=con.prepareStatement("select Type,Name from Upgrades where level=0");
                     ResultSet rs=query.executeQuery();
                     if (rs.isBeforeFirst()) {
@@ -146,7 +146,7 @@ public class City {
                 query.setString(1, GUID);
                 CName=Generate.genCityName(con);
                 query.setString(2, CName);
-                r=random.nextInt(7);
+                r=random.nextInt(8);
                 CUpgradeType=upgrades[r];
                 CUName=upnames[r];
                 query.setString(3, CUpgradeType);
