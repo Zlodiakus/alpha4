@@ -135,7 +135,7 @@ public class City {
             try {
                 int i=0;
                 Random random=new Random();
-                String [] upgrades = new String [8];
+                String [] upgrades = new String [7];
                 //String [] upnames = new String [8];
                 query=con.prepareStatement("select Type from Upgrades where level=0");
                 ResultSet rs=query.executeQuery();
@@ -155,7 +155,7 @@ public class City {
                 String CName = new StringBuffer(Name.toLowerCase()).reverse().toString();
                 CName = CName.substring(0,1).toUpperCase()+CName.substring(1,100);
                 query.setString(2, CName);
-                r=random.nextInt(8);
+                r=random.nextInt(7);
                 CUpgradeType=upgrades[r];
                 //CUName=upnames[r];
                 query.setString(3, CUpgradeType);
@@ -192,8 +192,8 @@ public class City {
 
                 int i=0;
                 Random random=new Random();
-                String [] upgrades = new String [8];
-                String [] upnames = new String [8];
+                String [] upgrades = new String [7];
+                String [] upnames = new String [7];
                     query=con.prepareStatement("select Type,Name from Upgrades where level=0");
                     ResultSet rs=query.executeQuery();
                     if (rs.isBeforeFirst()) {
@@ -211,7 +211,7 @@ public class City {
                 query.setString(1, GUID);
                 CName=Generate.genCityName(con);
                 query.setString(2, CName);
-                r=random.nextInt(8);
+                r=random.nextInt(7);
                 CUpgradeType=upgrades[r];
                 CUName=upnames[r];
                 query.setString(3, CUpgradeType);

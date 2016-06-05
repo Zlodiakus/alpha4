@@ -237,6 +237,8 @@ public World() throws SQLException {
             query.execute();
             query = con.prepareStatement("update Fractions set Gold=0");
             query.execute();
+            query = con.prepareStatement("truncate table Stats");
+            query.execute();
             query.close();
             con.commit();
             con.close();

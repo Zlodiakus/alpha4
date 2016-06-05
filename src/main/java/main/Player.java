@@ -496,7 +496,8 @@ public class Player {
         jresult.put("Gold",Gold);
         jresult.put("Race",Race);
         jresult.put("Hirelings",Hirelings);
-        int LeftToHire=getPlayerUpgradeEffect1("leadership") - Hirelings - HirelingsInAmbushes;
+        //int LeftToHire=getPlayerUpgradeEffect1("leadership") - Hirelings - HirelingsInAmbushes;
+        int LeftToHire=Level*100 - Hirelings - HirelingsInAmbushes;
         jresult.put("LeftToHire",LeftToHire);
         //jresult.put("HirelingsInAmbushes",HirelingsInAmbushes);
         PreparedStatement query;
@@ -1374,7 +1375,7 @@ public class Player {
                 jresult.put("Message", "В городе нет столько наемников!");
                 MyUtils.Logwrite("hirePeople",Name+" В городе нет столько наемников!", r.freeMemory());
             } else {
-                if (Hirelings + HirelingsInAmbushes + AMOUNT > getPlayerUpgradeEffect1("leadership")) {
+                if (Hirelings + HirelingsInAmbushes + AMOUNT > Level*100) {
                     jresult.put("Result", "O1304");
                     jresult.put("Message", "Вы пока не можете управлять таким количеством наемников!");
                     MyUtils.Logwrite("hirePeople",Name+" Вы пока не можете управлять таким количеством наемников!", r.freeMemory());
