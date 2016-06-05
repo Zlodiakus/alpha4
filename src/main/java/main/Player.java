@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 
+import static java.lang.System.in;
 
 
 /**
@@ -136,8 +137,11 @@ public class Player {
     }
 
     public String setRace(int race) {
-        Race=race;
-        update();
+        if (!(race >= 1 && race <=3)) { jresult.put("Result","O1101");jresult.put("Message","Выбрана несуществующая фракция");MyUtils.Logwrite("Player.setRace",Name +" читер? выбрал несуществующую расу "+race);}
+        else {
+            Race = race;
+            update();
+        }
         return jresult.toString();
     }
 
@@ -406,8 +410,37 @@ public class Player {
                         if (targetUpgrade.Type.equals("cargo")) {bonusUpgradeRecount(targetUpgrade.Effect1/currentUpgrade.Effect1);}
                         if (targetUpgrade.Type.equals("speed")) {profitUpgradeRecount(targetUpgrade.Effect1,targetUpgrade.Effect2);}
                         city.getGold(upcost/5);
-                        targetUpgrade.update(GUID, con);
+                        //targetUpgrade.update(GUID, con);
                         jresult.put("Result","OK");
+                        JSONObject jobj = new JSONObject();
+                        jobj.put("Type", targetUpgrade.Type);
+                        jobj.put("Name", targetUpgrade.Name);
+                        jobj.put("Description", targetUpgrade.Description);
+                        jobj.put("Level", targetUpgrade.Level);
+                        jobj.put("Effect1",targetUpgrade.Effect1);
+                        jobj.put("Effect2",targetUpgrade.Effect2);
+                        jresult.put("Upgrade",jobj);
+
+                        Upgrade nextUpgrade = new Upgrade(targetUpgrade.Type, targetUpgrade.Level + 1, con);
+                        if (nextUpgrade.GUID.equals("0")) {
+                            MyUtils.Logwrite("BuyUpgrade","Can't create object nextUpgrade " + nextUpgrade.result);
+                            //TODO - лажа полная, надо как-то переделать, низя 2 резалта выдавать.
+                            jresult.put("Result","BD001");
+                            jresult.put("Message", "Ошибка обращения к БД");
+                            //jresult.put("Error", "Техническая ошибка 20002, обратитесь в службу моральной поддержки!");
+                            return jresult.toString();
+                        }
+                        else {
+                            jobj = new JSONObject();
+                            jobj.put("Type", nextUpgrade.Type);
+                            jobj.put("Name", nextUpgrade.Name);
+                            jobj.put("Description", nextUpgrade.Description);
+                            jobj.put("Level", nextUpgrade.Level);
+                            jobj.put("ReqCityLev", nextUpgrade.ReqCityLev);
+                            jobj.put("Cost", nextUpgrade.Cost);
+                            jresult.put("NextUpgrade", jobj);
+                        }
+
                         ret = jresult.toString();
                     } else {
                         jresult.put("Result","O0703");
@@ -463,6 +496,8 @@ public class Player {
         jresult.put("Gold",Gold);
         jresult.put("Race",Race);
         jresult.put("Hirelings",Hirelings);
+        int LeftToHire=getPlayerUpgradeEffect1("leadership") - Hirelings - HirelingsInAmbushes;
+        jresult.put("LeftToHire",LeftToHire);
         //jresult.put("HirelingsInAmbushes",HirelingsInAmbushes);
         PreparedStatement query;
         try {
@@ -590,7 +625,8 @@ public class Player {
             query.close();
             jresult.put("Ambushes",jarr2);
         } catch (SQLException e) {
-            jresult.put("Error",e.toString());
+            jresult.put("Result","DB001");
+            jresult.put("Message","Ошибка обращения к БД");
         }
         MyUtils.Logwrite("GetPlayerInfo","Finished by "+Name, r.freeMemory());
         return jresult.toString();
@@ -1078,8 +1114,12 @@ public class Player {
                         int accel = getPlayerUpgradeEffect1("speed");
                         int speed = getPlayerUpgradeEffect2("speed");
                         int cargo = getPlayerUpgradeEffect1("cargo");
-                        Caravan caravan = new Caravan(con);
-                        res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
+                        if (Hirelings<2) {jresult.put("Result","O0606");jresult.put("Message","Недостаточно людей для запуска каравана. Нужно 2.");res=jresult.toString();}
+                        else {
+                            Caravan caravan = new Caravan(con);
+                            res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
+                            if (res.contains("OK")) {Hirelings-=2;}
+                        }
                     }
                     else {
                         jresult.put("Result","O0604");
@@ -1135,12 +1175,12 @@ public class Player {
             jresult.put("Result", "OK");
             MyUtils.Logwrite("DropUnfinishedRoute","Finished by "+Name, r.freeMemory());
             return jresult.toString();
-        } catch (SQLException e) {jresult.put("Error","DropUnfinishedRoute "+e.toString()); return jresult.toString();}
+        } catch (SQLException e) {jresult.put("Result","DB001");jresult.put("Message","Ошибка обращения к БД"); return jresult.toString();}
     }
 
     public String DropRoute(String TGUID) {
         MyUtils.Logwrite("DropRoute","Started by "+Name, r.freeMemory());
-        PreparedStatement query;
+        /*PreparedStatement query;
         String OwnerGUID;
         try {
             query = con.prepareStatement("select PGUID from Caravans where GUID=?");
@@ -1164,6 +1204,10 @@ public class Player {
             }
             else {query.close();jresult.put("Error", "Ты не можешь отменить маршрут другого игрока!");}
         } catch (SQLException e) {jresult.put("Error","DropRoute "+e.toString());}
+        */
+        jresult.put("Result","DB001");
+        jresult.put("Message","Читер что-ли? Отменять маршруты уже нельзя");
+        MyUtils.Logwrite("DropRoute",Name+" читер? пытался маршрут отменить.", r.freeMemory());
         MyUtils.Logwrite("DropRoute","Finished by "+Name, r.freeMemory());
         return jresult.toString();
     }
@@ -1317,7 +1361,7 @@ public class Player {
     }
 
     private String hirePeople(String TGUID, int AMOUNT) {
-        int hireCost;
+        int hireCost; float RaceBonus,RaceDiscount;
         City city = new City(TGUID,con);
         if (!checkRangeToObj(TGUID)) {
             jresult.put("Result", "O1302");
@@ -1331,7 +1375,14 @@ public class Player {
                     jresult.put("Result", "O1304");
                     jresult.put("Message", "Вы пока не можете управлять таким количеством наемников!");
                 } else {
-                    hireCost = AMOUNT * (int) (100 * Math.sqrt(city.Level)) * (100 - getPlayerUpgradeEffect1("bargain")) / 100;
+                    RaceBonus=0;
+                    if (city.Influence1+city.Influence2+city.Influence3>0) {
+                        if (Race==1) {RaceBonus=(float)city.Influence1/(city.Influence1+city.Influence2+city.Influence3);}
+                        if (Race==2) {RaceBonus=(float)city.Influence2/(city.Influence1+city.Influence2+city.Influence3);}
+                        if (Race==3) {RaceBonus=(float)city.Influence3/(city.Influence1+city.Influence2+city.Influence3);}
+                    }
+                    RaceDiscount=1-RaceBonus/4;
+                    hireCost = (int) (RaceDiscount * AMOUNT * (int) (100 * Math.sqrt(city.Level)) * (100 - getPlayerUpgradeEffect1("bargain")) / 100);
                     if (Gold < hireCost) {
                         jresult.put("Result", "O1303");
                         jresult.put("Message", "Вам не хватает денег! Требуется " + hireCost + " золота!");
@@ -1403,7 +1454,7 @@ public class Player {
                 }
             }
             jresult.put("Messages",jarr);
-        } catch (SQLException e) {jresult.put("Error","SQL Error: "+e.toString());}
+        } catch (SQLException e) {jresult.put("Result","DB001");jresult.put("Message","Ошибка обращения к БД");}
         MyUtils.Logwrite("GetMessage","Finished by "+Name, r.freeMemory());
         return jresult.toString();
     }
