@@ -205,7 +205,7 @@ public class City {
                         query.close();
                         rs.close();
                     }
-                    else {query.close();rs.close();return "Ошибка обращения к базе данных при поиске доступных апгрейдов!";}
+                    else {query.close();rs.close(); jresult.put("Result","BD001");jresult.put("Message","Ошибка обращения к БД"); return jresult.toString();}
 
                 query = con.prepareStatement("INSERT INTO Cities (GUID,Name,UpgradeType, Creator) VALUES(?,?,?,?)");
                 query.setString(1, GUID);
@@ -252,6 +252,7 @@ public class City {
                 jresult.put("City",jobj);
                 dist=(int)MyUtils.RangeCheck(LAT,LNG,TLAT,TLNG);
                 jresult.put("Message","Город успешно основан в "+dist+" метрах от запланированного места");
+                createKvantCity(PGUID,LAT,LNG,CName);
             } catch (SQLException e) {
                 jresult.put("Result","BD001");
                 jresult.put("Message", "Ошибка взаимодействия с базой данных при установке города.");
@@ -262,8 +263,6 @@ public class City {
             jresult.put("Result","O1202");
             jresult.put("Message", "Невозможно основать город здесь. Другой город слишком близко!");
         }
-
-
         return jresult.toString();
     }
 
