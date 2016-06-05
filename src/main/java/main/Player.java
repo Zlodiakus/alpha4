@@ -1319,7 +1319,7 @@ public class Player {
     private String hirePeople(String TGUID, int AMOUNT) {
         int hireCost;
         City city = new City(TGUID,con);
-        if (checkRangeToObj(TGUID)) {
+        if (!checkRangeToObj(TGUID)) {
             jresult.put("Result", "O1302");
             jresult.put("Message", "Город слишком далеко!");}
         else {
