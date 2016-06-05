@@ -115,6 +115,71 @@ public class City {
         return result;
     }
 
+    public void createKvantCity(String PGUID, int TLAT, int TLNG, String Name) {
+        PreparedStatement query;
+        String CUpgradeType,CUName;
+        int LAT, LNG, r;
+        int randLat,randLng,maxRandLng,minRandLng;
+
+        randLat=(int)(Math.random()*20000)-10000;
+        maxRandLng=(int)Math.sqrt(10000*10000-randLat*randLat);
+        if (Math.abs(randLat)<1000) {minRandLng=(int)Math.sqrt(1000*1000-randLat*randLat);}
+        else minRandLng=0;
+        randLng= (int)Math.signum((Math.random()*20000-10000))*(minRandLng+(int)(Math.random()*(maxRandLng-minRandLng)));
+        int delta_lat_rand=(int)(1000000*Math.asin((180/3.1415926)*(randLat)/(6378137)));
+        int delta_lng_rand=(int)(1000000*Math.asin((180/3.1415926)*(randLng)/(6378137*Math.cos((TLAT/1000000)*3.1415926/180))));
+        LAT=TLAT+delta_lat_rand;
+        LNG=TLNG+delta_lng_rand;
+
+        if (canCreateCity(PGUID, LAT, LNG, 0, con)) {
+            try {
+                int i=0;
+                Random random=new Random();
+                String [] upgrades = new String [8];
+                //String [] upnames = new String [8];
+                query=con.prepareStatement("select Type from Upgrades where level=0");
+                ResultSet rs=query.executeQuery();
+                if (rs.isBeforeFirst()) {
+                    while (rs.next()) {
+                        i=i+1;
+                        upgrades[i-1]=rs.getString("Type");
+                        //upnames[i-1]=rs.getString("Name");
+                    }
+                    query.close();
+                    rs.close();
+                }
+                else {query.close();rs.close();return;}
+
+                query = con.prepareStatement("INSERT INTO Cities (GUID,Name,UpgradeType, Creator) VALUES(?,?,?,?)");
+                query.setString(1, GUID);
+                String CName = new StringBuffer(Name.toLowerCase()).reverse().toString();
+                CName = CName.substring(0,1).toUpperCase()+CName.substring(1,100);
+                query.setString(2, CName);
+                r=random.nextInt(8);
+                CUpgradeType=upgrades[r];
+                //CUName=upnames[r];
+                query.setString(3, CUpgradeType);
+                query.setString(4, PGUID);
+                query.execute();
+                query.close();
+
+                query = con.prepareStatement("INSERT INTO GameObjects(GUID,Lat,Lng,Type)VALUES(?,?,?,'City')");
+                query.setString(1, GUID);
+                query.setInt(2, LAT);
+                query.setInt(3, LNG);
+                query.execute();
+                query.close();
+                con.commit();
+            } catch (SQLException e) {
+                MyUtils.Logwrite("City.createKvantCity", "PGUID=(" + PGUID + ")" + e.toString());
+            }
+        } else {
+            //jresult.put("Error", "Can't set ambush here. City or another ambush is too close.");
+            MyUtils.Logwrite("City.createKvantCity", "Квантовому городу не повезло, другой город был рядом. PGUID=(" + PGUID + ")");
+        }
+    }
+
+
     public String createCity(String PGUID, int TLAT, int TLNG, int mapper) {
         PreparedStatement query;
         String CName, CUpgradeType,CUName;
