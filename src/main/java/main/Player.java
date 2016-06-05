@@ -1049,6 +1049,7 @@ public class Player {
             res=ambush.Destroy(TGUID,con);
             jobj.put("Result","OK");
             if (res.equals(jobj.toString())) {
+                Hirelings=Hirelings+ambush.Life*10;
                 MyUtils.Logwrite("Player.CancelAmbush","Ambush "+TGUID+" canceled by owner "+GUID);
             }
         } else {
