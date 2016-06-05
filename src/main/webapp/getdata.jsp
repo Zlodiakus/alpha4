@@ -25,7 +25,8 @@ int LNG=Integer.parseInt(LngS);
 String PRace=request.getParameter("Race");
 if (PRace == null) PRace="0";
 int RACE=Integer.parseInt(PRace);
-int AMOUNT=0;
+String AMOUNTS=request.getParameter("Amount");
+int AMOUNT=Integer.parseInt(AMOUNTS);
 //check=false;
 if (check) {
 Player player=new Player(token, PLAT, PLNG);
