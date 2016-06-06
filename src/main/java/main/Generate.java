@@ -389,12 +389,13 @@ public class Generate {
 
     public static void genKvant() {
         try {
+            MyUtils.Logwrite("Generate.genKvant", "Зашли");
             Connection con = DBUtils.ConnectDB();
             PreparedStatement query;
             query = con.prepareStatement("select z1.Creator, z1.Name, z2.Lat, z2.Lng from Cities z1,GameObjects z2 where z2.GUID=z1.GUID and z1.kvant=0 and z1.GUID not in (select GUID from Cities where kvant=0 and (Creator,REVERSE(UPPER(Name))) in (select Creator,UPPER(Name) from Cities where Kvant=1))");
             ResultSet rs = query.executeQuery();
+            City city = new City("0",con);
             while (rs.next()) {
-                City city = new City("0",con);
                 city.createKvantCity(rs.getString("Creator"),rs.getInt("Lat"),rs.getInt("Lng"),rs.getString("Name"));
             }
             con.commit();
