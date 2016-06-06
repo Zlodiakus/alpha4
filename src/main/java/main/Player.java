@@ -484,7 +484,7 @@ public class Player {
 
     public String GetPlayerInfo() {
         MyUtils.Logwrite("GetPlayerInfo","Started by "+Name, r.freeMemory());
-        int TNL, Caravans,Ambushes,AmbushesMax,AmbushesLeft,UpLevel,Distance,AmbLat,AmbLng,AmbushRadius,ActionDistance,LatS,LngS,LatF,LngF,UpCost,UpReqCityLevel, profit;
+        int TNL, Caravans,Ambushes,AmbushesMax,AmbushesLeft,UpLevel,Distance,AmbLat,AmbLng,AmbushRadius,ActionDistance,LatS,LngS,LatF,LngF,UpCost,UpReqCityLevel, profit,foundedCities;
         String UpType,UpName,UpDesc,CarGUID,StartGUID,StartName,FinishGUID,FinishName,AmbGUID,AmbName;
         ResultSet rs;
         JSONArray jarr2 = new JSONArray();
@@ -512,6 +512,13 @@ public class Player {
             Caravans = rs.getInt(1);
             rs.close();
             jresult.put("Caravans",Caravans);
+            query=con.prepareStatement("select count(1) from Cities where Creator=?");
+            query.setString(1,GUID);
+            rs=query.executeQuery();
+            if (rs.first()) foundedCities=rs.getInt(1);
+            else foundedCities=0;
+            jresult.put("FoundedCities",foundedCities);
+
             query=con.prepareStatement("select count(1) from Ambushes where PGUID=?");
             query.setString(1, GUID);
             rs = query.executeQuery();
@@ -689,12 +696,12 @@ public class Player {
 
         PreparedStatement query, query2;
         ResultSet rs;
-        String TPGUID, CName, CUpgradeType, Start, Finish, StartName, FinishName, CUName, TName;
-        int CLevel, TRadius, TTTS, CRadius, StartLat, StartLng, FinishLat, FinishLng, Speed, progress,COwner,AOwner, TLife;
+        String TPGUID, CName, CUpgradeType, Start, Finish, StartName, FinishName, CUName, TName, CreatorName;
+        int CLevel, TRadius, TTTS, CRadius, StartLat, StartLng, FinishLat, FinishLng, Speed, progress,COwner,AOwner, TLife,CHirelings;
         MyUtils.Logwrite("ScanRange","Started by "+Name,r.freeMemory());
         String TGUID, Type, TLat, TLng, Result;
         long CExp, NExp, TExp, Inf1, Inf2, Inf3;
-        int deltaLatCities=11229;
+        int deltaLatCities=17967; //2km
         int deltaLngCities=(int)(deltaLatCities/Math.cos((Lat / 1e6) * Math.PI / 180));
         if (GUID.equals("")) {jresult.put("Error","No player found."); return jresult.toString();}
         try {
@@ -781,7 +788,7 @@ public class Player {
             }
 
             //Города
-            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.Creator,z2.Name,z2.Level,z2.Exp currentExp,z3.Exp nextLevelExp,z4.Exp thisLevelExp, z2.UpgradeType, (select z3.Name from Upgrades z3 where z2.UpgradeType=z3.Type and z3.Level=0 LIMIT 1) UName, z2.Influence1, z2.Influence2, z2.Influence3 from GameObjects z1 USE INDEX (`LatLng`), Cities z2, Levels z3, Levels z4 where z2.GUID=z1.GUID and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+? and z3.Type='city' and z3.Level=z2.Level+1 and z4.level=z2.level and z4.Type='City'");
+            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.Hirelings, z2.Creator, (select Name from Players p where z2.Creator=p.GUID) as CreatorName,z2.Name,z2.Level,z2.Exp currentExp,z3.Exp nextLevelExp,z4.Exp thisLevelExp, z2.UpgradeType, (select z3.Name from Upgrades z3 where z2.UpgradeType=z3.Type and z3.Level=0 LIMIT 1) UName, z2.Influence1, z2.Influence2, z2.Influence3 from GameObjects z1 USE INDEX (`LatLng`), Cities z2, Levels z3, Levels z4 where z2.GUID=z1.GUID and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+? and z3.Type='city' and z3.Level=z2.Level+1 and z4.level=z2.level and z4.Type='City'");
             query.setInt(1, Lat);
             query.setInt(2, deltaLatCities);
             query.setInt(3, deltaLatCities);
@@ -808,6 +815,8 @@ public class Player {
                     Inf2 = rs.getLong("Influence2");
                     Inf3 = rs.getLong("Influence3");
                     CRadius=100+5*(CLevel - 1);
+                    CreatorName=rs.getString("CreatorName");
+                    CHirelings=rs.getInt("Hirelings");
                     jobj.put("GUID", TGUID);
                     jobj.put("Type", Type);
                     jobj.put("Lat", TLat);
@@ -822,6 +831,8 @@ public class Player {
                     jobj.put("Influence2",Inf2);
                     jobj.put("Influence3",Inf3);
                     jobj.put("Owner",rs.getString("Creator").equals(GUID));
+                    jobj.put("Creator",CreatorName);
+                    jobj.put("Hirelings",CHirelings);
                     jarr.add(jobj);
                 }
             }
