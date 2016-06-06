@@ -45,7 +45,7 @@ public World() throws SQLException {
         PreparedStatement query;
         MyUtils.Logwrite("World.citiesHire", "Start");
         try {
-            query = con.prepareStatement("update Cities set Hirelings=MIN(100*Level,Hirelings+4*Level) where Hirelings<100*Level");
+            query = con.prepareStatement("update Cities set Hirelings=LEAST(100*Level,Hirelings+4*Level) where Hirelings<100*Level");
             query.execute();
             con.commit();
             query.close();
