@@ -512,7 +512,7 @@ public class Player {
             Caravans = rs.getInt(1);
             rs.close();
             jresult.put("Caravans",Caravans);
-            query=con.prepareStatement("select count(1) from Cities where Creator=?");
+            query=con.prepareStatement("select count(1) from Cities where Creator=? and kvant=0");
             query.setString(1,GUID);
             rs=query.executeQuery();
             if (rs.first()) foundedCities=rs.getInt(1);
