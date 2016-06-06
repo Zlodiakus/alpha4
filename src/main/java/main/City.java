@@ -152,8 +152,8 @@ public class City {
 
                 query = con.prepareStatement("INSERT INTO Cities (GUID,Name,UpgradeType, Creator, Kvant) VALUES(?,?,?,?,?)");
                 query.setString(1, GUID);
-                String CName = new StringBuffer(Name.toLowerCase()).reverse().toString();
-                String CityName = CName.substring(0,1).toUpperCase()+CName.substring(1);
+                String CName = new StringBuffer(Name).reverse().toString();
+                String CityName = CName.substring(0,1).toUpperCase()+CName.substring(1).toLowerCase();
                 query.setString(2, CityName);
                 r=random.nextInt(7);
                 CUpgradeType=upgrades[r];
@@ -163,6 +163,7 @@ public class City {
                 query.setBoolean(5,true);
                 query.execute();
                 query.close();
+                MyUtils.Logwrite("City.createKvantCity", "Создан квантовый город "+CityName+" GUID=(" + GUID + ")");
 
                 query = con.prepareStatement("INSERT INTO GameObjects(GUID,Lat,Lng,Type)VALUES(?,?,?,'City')");
                 query.setString(1, GUID);

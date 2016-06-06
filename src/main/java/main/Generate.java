@@ -1,5 +1,6 @@
 package main;
 
+import javax.naming.Name;
 import javax.naming.NamingException;
 import java.awt.*;
 import java.sql.Connection;
@@ -375,6 +376,7 @@ public class Generate {
                 }
             }
             con.commit();
+            con.close();
             return "100 invites generated.";
         } catch (SQLException | NamingException e) {
             return e.toString();
@@ -385,6 +387,21 @@ public class Generate {
         return UUID.randomUUID().toString();
     }
 
-
+    public static void genKvant() {
+        try {
+            Connection con = DBUtils.ConnectDB();
+            PreparedStatement query;
+            query = con.prepareStatement("select z1.PGUID, z1.Name, z2.Lat, z2.Lng from Cities z1,GameObjects z2 where z2.GUID=z1.GUID and z1.kvant=0");
+            ResultSet rs = query.executeQuery();
+            while (rs.next()) {
+                City city = new City("0",con);
+                city.createKvantCity(rs.getString("PGUID"),rs.getInt("Lat"),rs.getInt("Lng"),rs.getString("Name"));
+            }
+            con.commit();
+            con.close();
+        } catch (SQLException | NamingException e) {
+            MyUtils.Logwrite("Generate.genKvant", e.toString());
+        }
+    }
 
 }
