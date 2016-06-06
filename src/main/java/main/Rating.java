@@ -25,13 +25,13 @@ public class Rating {
             while (rs.next()){
                 i=i+1;
                 ccolor="primary";
-                if (rs.getInt(9)==1) {
+                if (rs.getInt(6)==1) {
                     ccolor="info";
                 }
-                if (rs.getInt(9)==2) {
+                if (rs.getInt(6)==2) {
                     ccolor="danger";
                 }
-                if (rs.getInt(9)==3) {
+                if (rs.getInt(6)==3) {
                     ccolor="warning";
                 }
                 result=result+"<tr class="+ccolor+"><td>"+i+"</td><td><b>"+rs.getString(1)+"</b></td><td>"+rs.getInt(2)+"</td><td>"+rs.getInt(3)+"</td><td>"+rs.getInt(4)+"</td><td>"+rs.getInt(5)+"</td><td>"+rs.getInt(7)+"</td><td>"+rs.getInt(8)+"</td><td>"+rs.getInt(9)+"</td></tr>";

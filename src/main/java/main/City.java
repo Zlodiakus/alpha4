@@ -164,7 +164,7 @@ public class City {
                 query.setBoolean(5,true);
                 query.execute();
                 query.close();
-                MyUtils.Logwrite("City.createKvantCity", "Создан квантовый город "+CityName+" GUID=(" + GUID + ")");
+                MyUtils.Logwrite("City.createKvantCity", "Создан квантовый город "+CityName+" GUID=(" + kvantGUID + ")");
 
                 query = con.prepareStatement("INSERT INTO GameObjects(GUID,Lat,Lng,Type)VALUES(?,?,?,'City')");
                 query.setString(1, kvantGUID);
