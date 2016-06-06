@@ -3,6 +3,7 @@
     <%@page import="main.Generate"%>
 <%
 String result="test";
-result=main.Generate.genKvant();
+Generate generate = new Generate();
+result=generate.genKvant();
 %>
 <%=result%>

@@ -15,16 +15,11 @@ import java.util.Random;
  * @author Shadilan
  */
 public class Generate {
-    /**
-     * Generate city from coordinates.
-     * String wrapper
-     * @param Lat1 Latitude
-     * @param Lng1 Longtitude
-     * @param Lat2 Latitude
-     * @param Lng2 Longtitude
-     * @param count Number of cities
-     * @return Generation info
-     */
+
+    public Generate() {
+
+    }
+
 
     public static String GenCity(String Lat1, String Lng1, String Lat2, String Lng2, String count) {
         String result;
@@ -387,7 +382,7 @@ public class Generate {
         return UUID.randomUUID().toString();
     }
 
-    public static String genKvant() {
+    public String genKvant() {
         try {
             MyUtils.Logwrite("Generate.genKvant", "Зашли");
             Connection con = DBUtils.ConnectDB();
