@@ -214,7 +214,8 @@ public World() throws SQLException {
     }
 
     public static String Destroy() {
-        PreparedStatement query;
+        return "Undestroyble";
+        /*PreparedStatement query;
         try {
             Connection con = DBUtils.ConnectDB();
             query = con.prepareStatement("truncate table Players");
@@ -243,7 +244,7 @@ public World() throws SQLException {
             con.commit();
             con.close();
             return "World destroyed. MUHAHAHA!";
-        } catch (SQLException |NamingException e) {return "Oops, God protected this world with "+e.toString();}
+        } catch (SQLException |NamingException e) {return "Oops, God protected this world with "+e.toString();}*/
     }
 
     public static String Create() {
