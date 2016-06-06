@@ -387,7 +387,7 @@ public class Generate {
         return UUID.randomUUID().toString();
     }
 
-    public static void genKvant() {
+    public static String genKvant() {
         try {
             MyUtils.Logwrite("Generate.genKvant", "Зашли");
             Connection con = DBUtils.ConnectDB();
@@ -402,7 +402,9 @@ public class Generate {
             con.close();
         } catch (SQLException | NamingException e) {
             MyUtils.Logwrite("Generate.genKvant", e.toString());
+            return "Kvant Error! "+e.toString();
         }
+        return "Kvant ok!";
     }
 
 }
