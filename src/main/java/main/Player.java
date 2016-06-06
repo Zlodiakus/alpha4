@@ -676,7 +676,7 @@ public class Player {
         String result;
         boolean ret;
         try {
-            query = con.prepareStatement("select z1.Effect1-(select count(1) from Cities where Creator=?) from Upgrades z1, PUpgrades z2 where z2.UGUID=z1.GUID and z2.PGUID=? and z1.TYPE='founder'");
+            query = con.prepareStatement("select z1.Effect1-(select count(1) from Cities where Creator=? and kvant=0) from Upgrades z1, PUpgrades z2 where z2.UGUID=z1.GUID and z2.PGUID=? and z1.TYPE='founder'");
             query.setString(1, GUID);
             query.setString(2, GUID);
             rs = query.executeQuery();

@@ -252,6 +252,7 @@ public class City {
                 jobj.put("Influence3",0);
                 jobj.put("Owner",true);
                 jobj.put("Hirelings",100);
+                jobj.put("Creator",Name);
                 jresult.put("City",jobj);
                 dist=(int)MyUtils.RangeCheck(LAT,LNG,TLAT,TLNG);
                 jresult.put("Message","Город успешно основан в "+dist+" метрах от запланированного места");
