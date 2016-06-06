@@ -150,16 +150,17 @@ public class City {
                 }
                 else {query.close();rs.close();return;}
 
-                query = con.prepareStatement("INSERT INTO Cities (GUID,Name,UpgradeType, Creator) VALUES(?,?,?,?)");
+                query = con.prepareStatement("INSERT INTO Cities (GUID,Name,UpgradeType, Creator, Kvant) VALUES(?,?,?,?,?)");
                 query.setString(1, GUID);
                 String CName = new StringBuffer(Name.toLowerCase()).reverse().toString();
-                CName = CName.substring(0,1).toUpperCase()+CName.substring(1,100);
-                query.setString(2, CName);
+                String CityName = CName.substring(0,1).toUpperCase()+CName.substring(1);
+                query.setString(2, CityName);
                 r=random.nextInt(7);
                 CUpgradeType=upgrades[r];
                 //CUName=upnames[r];
                 query.setString(3, CUpgradeType);
                 query.setString(4, PGUID);
+                query.setBoolean(5,true);
                 query.execute();
                 query.close();
 
