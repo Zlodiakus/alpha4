@@ -125,10 +125,10 @@ public class Player {
             }
             query = con.prepareStatement("select 10*sum(Life) HirelingsInAmbushes from Ambushes where PGUID=?)");
             query.setString(1,GUID);
-            rs = query.executeQuery();
-            if (rs.isBeforeFirst()) {
-                rs.first();
-                HirelingsInAmbushes = rs.getInt("HirelingsInAmbushes");
+            ResultSet rs2 = query.executeQuery();
+            if (rs2.isBeforeFirst()) {
+                rs2.first();
+                HirelingsInAmbushes = rs2.getInt("HirelingsInAmbushes");
             }
             else {HirelingsInAmbushes=0;}
             query.close();
