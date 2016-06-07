@@ -992,8 +992,7 @@ public class Player {
                 else {
                     Ambush ambush = new Ambush();
                     res = ambush.Set(GUID, TLAT, TLNG, Radius, -TTS, Life, false, con);
-                    Hirelings-=10*Life;
-                    update();
+                    if (res.contains("OK")) {Hirelings-=10*Life;update();}
                 }
             } else {
                 jresult.put("Result", "O0203");jresult.put("Message","Все засады уже установлены!");
