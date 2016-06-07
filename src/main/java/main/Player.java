@@ -125,12 +125,12 @@ public class Player {
             }
             query = con.prepareStatement("select 10*sum(Life) HirelingsInAmbushes from Ambushes where PGUID=?)");
             query.setString(1,GUID);
+            rs = query.executeQuery();
             if (rs.isBeforeFirst()) {
                 rs.first();
                 HirelingsInAmbushes = rs.getInt("HirelingsInAmbushes");
             }
             else {HirelingsInAmbushes=0;}
-
             query.close();
         } catch (SQLException e) {
             LastError = MyUtils.getJSONError("DBError", e.toString() + "\n" + Arrays.toString(e.getStackTrace()));
@@ -706,7 +706,7 @@ public class Player {
         if (GUID.equals("")) {jresult.put("Error","No player found."); return jresult.toString();}
         try {
             //Караваны
-            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type, z2.PGUID, z2.Start, z2.Finish, z2.Speed, z3.Race from GameObjects z1, Caravans z2, Players z3 where z3.GUID=z2.PGUID and z2.GUID=z1.GUID and ? between z1.Lat-10000 and z1.Lat+10000 and ? between z1.Lng-10000 and z1.Lng+10000");
+            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type, z2.PGUID, z2.Start, z2.Finish, z2.Speed, z3.Race from GameObjects z1, Caravans z2, Players z3 where z3.GUID=z2.PGUID and z2.GUID=z1.GUID and ? between z1.Lat-12000 and z1.Lat+12000 and ? between z1.Lng-15000 and z1.Lng+15000");
             query.setInt(1, Lat);
             query.setInt(2, Lng);
 
@@ -756,7 +756,7 @@ public class Player {
             }
 
             //Засады
-            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.PGUID,z2.Radius,z2.TTS,z2.Name,z3.Race,z2.Life from GameObjects z1, Ambushes z2, Players z3 where z3.GUID=z2.PGUID and z2.GUID=z1.GUID and ? between z1.Lat-10000 and z1.Lat+10000 and ? between z1.Lng-10000 and z1.Lng+10000");
+            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.PGUID,z2.Radius,z2.TTS,z2.Name,z3.Race,z2.Life from GameObjects z1, Ambushes z2, Players z3 where z3.GUID=z2.PGUID and z2.GUID=z1.GUID and ? between z1.Lat-12000 and z1.Lat+12000 and ? between z1.Lng-15000 and z1.Lng+15000");
             query.setInt(1, Lat);
             query.setInt(2, Lng);
             rs = query.executeQuery();
@@ -1028,6 +1028,7 @@ public class Player {
                     if (res.equals(jobj.toString())) {
                         //bonus = 10 + getPlayerUpgradeEffect2("paladin");
                         bonus = (20 + Math.min(720, ambush.TTS + 180) * ambush.Life) * getPlayerUpgradeEffect2("paladin") / 20;
+                        if (ambush.PGUID.equals("Elf")) bonus+=1000;
                         jobj.put("Message", "Награда за уничтожение засады составила " + Integer.toString(bonus) + " золота!");
                         Hirelings -= 5 * ambush.Life; //апдейт в гетГолде пройдет
                         getGold(bonus);
