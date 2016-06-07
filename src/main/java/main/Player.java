@@ -137,9 +137,10 @@ public class Player {
             if (rs2.isBeforeFirst()) {
                 rs2.first();
                 HirelingsInAmbushes = rs2.getInt("HirelingsInAmbushes");
-                MyUtils.Logwrite("Player","HirelingsInAmbushes="+HirelingsInAmbushes+" GUID="+GUID);
+                //MyUtils.Logwrite("Player","HirelingsInAmbushes="+HirelingsInAmbushes+" GUID="+GUID);
             }
-            else {HirelingsInAmbushes=0; MyUtils.Logwrite("Player","else HirelingsInAmbushes=0. GUID="+GUID);}
+            else {HirelingsInAmbushes=0; //MyUtils.Logwrite("Player","else HirelingsInAmbushes=0. GUID="+GUID);
+            }
             query.close();
         } catch (SQLException e) {
             LastError = MyUtils.getJSONError("DBError", e.toString() + "\n" + Arrays.toString(e.getStackTrace()));
