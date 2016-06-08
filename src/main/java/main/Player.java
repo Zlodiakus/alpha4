@@ -1468,11 +1468,15 @@ public class Player {
             rs=query.executeQuery();
             rs.last();
             total=rs.getRow();
+            MyUtils.Logwrite("getRandomCity","total="+total);
             Random random=new Random();
             rand=1+random.nextInt(total);
+            MyUtils.Logwrite("getRandomCity","rand="+rand);
             rs.absolute(rand);
+            MyUtils.Logwrite("getRandomCity","отработал rs.absolute");
             CGUID=rs.getString("GUID");
-        } catch (SQLException e) {MyUtils.Logwrite("PLayer.getRandomCity",e.toString());CGUID="";}
+            MyUtils.Logwrite("getRandomCity","CGUID="+CGUID);
+        } catch (SQLException e) {MyUtils.Logwrite("Player.getRandomCity",e.toString());CGUID="";}
         return CGUID;
     }
 
