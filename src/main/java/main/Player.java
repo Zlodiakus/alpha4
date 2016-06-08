@@ -80,7 +80,7 @@ public class Player {
             } else {
                 MyUtils.Logwrite("Player","Player "+GUID+" not found");
             }
-            PreparedStatement query2 = con.prepareStatement("select 10*sum(Life) as HirelingsInAmbushes from Ambushes where PGUID=?)");
+            PreparedStatement query2 = con.prepareStatement("select 10*sum(Life) as HirelingsInAmbushes from Ambushes where PGUID=?");
             query2.setString(1,GUID);
             ResultSet rs2 = query2.executeQuery();
             if (rs2.isBeforeFirst()) {
