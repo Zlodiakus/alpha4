@@ -9,7 +9,10 @@ import utility.StringUtils;
 public class Version {
     public static boolean checkVersion(String version){
         return  "3.0.0a".equals(version) ||
-                "3.0.1a".equals(version);
+                "3.0.1a".equals(version)||
+                "3.0.2a".equals(version)||
+                "3.0.3a".equals(version)
+                ;
     }
     public static boolean checkHash(String hash,String version,String operation,String... params){
         String code;
@@ -17,6 +20,10 @@ public class Version {
             case "3.0.0a":code="COWBOW";
                 break;
             case "3.0.1a":code="COWBOW";
+                break;
+            case "3.0.2a":code="COWBOW";
+                break;
+            case "3.0.3a":code="COWBOW";
                 break;
             default: return false;
         }
