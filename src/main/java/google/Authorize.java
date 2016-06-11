@@ -267,6 +267,10 @@ public class Authorize {
                 }
                 rs2.close();
                 query.close();
+                //Очистка старых коннектов
+                pstmt = con.prepareStatement("DELETE FROM Connections WHERE CurrentDate<ADDDATE( CURRENT_TIMESTAMP( ) , INTERVAL -1\n" +
+                        "DAY )");
+                pstmt.execute();
                 pstmt = con.prepareStatement("INSERT into Connections (PGUID,Token) Values(?,?)");
                 pstmt.setString(1, PGUID);
                 pstmt.setString(2, Token);
