@@ -28,6 +28,10 @@ function initialize(){
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map =new  google.maps.Map(document.getElementById("map-canvas"),mapOptions);
+    map.addListener('bounds_changed',function(){
+        getData();
+
+    })
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
@@ -109,9 +113,11 @@ function getData(){
                         city.up=currentVal.Upgrade;
                         city.name=currentVal.Name;
                         city.race=currentVal.Faction;
+
                         city.mark = new google.maps.Marker({
                             position: {lat: city.lat, lng: city.lng},
                             title: city.name,
+                            icon: "intel/img/city_"+(city.level/2);
                             map: map
                         });
                         cities.push(city);
