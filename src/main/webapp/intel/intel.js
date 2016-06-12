@@ -82,7 +82,7 @@ function getData(){
     	var maxlng=Math.round(map_bounds.getNorthEast().lng()*1E6);
         xmlhttp = getXmlHttp();
         console.log("/intel/api.jsp?ReqName=GetData&Token="+token+"&StartLat="+minlat+"&StartLng="+minlng+"&FinishLat="+maxlat+"&FinishLng="+maxlng);
-        xmlhttp.open("/intel/api.jsp?ReqName=GetData&Token="+token+"&StartLat="+minlat+"&StartLng="+minlng+"&FinishLat="+maxlat+"&FinishLng="+maxlng, true);
+        xmlhttp.open('GET',"/intel/api.jsp?ReqName=GetData&Token="+token+"&StartLat="+minlat+"&StartLng="+minlng+"&FinishLat="+maxlat+"&FinishLng="+maxlng, true);
         xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == 4) {
