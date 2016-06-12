@@ -291,10 +291,10 @@ public class intel {
                             "AND g.Lat between ? and ?"+
                             "AND g.Lng between ? and ?");
                     pstmt.setString(1,pguid);
-                    pstmt.setInt(1, Lat1);
-                    pstmt.setInt(1,Lat2);
-                    pstmt.setInt(1,Lng1);
-                    pstmt.setInt(1,Lng2);
+                    pstmt.setInt(2, Lat1);
+                    pstmt.setInt(3,Lat2);
+                    pstmt.setInt(4,Lng1);
+                    pstmt.setInt(5,Lng2);
 
                     rs=pstmt.executeQuery();
                     JSONArray cities=new JSONArray();
