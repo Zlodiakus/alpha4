@@ -311,7 +311,7 @@ public class intel {
                         obj.put("Inf1",rs.getInt(9));
                         obj.put("Inf2",rs.getInt(10));
                         obj.put("Inf3",rs.getInt(11));
-                        obj.put("Owner",rs.getInt(12));
+
 
                         cities.add(obj);
                     }
