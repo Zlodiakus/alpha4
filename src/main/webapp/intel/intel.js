@@ -111,7 +111,7 @@ function getData(){
                         city.race=currentVal.Faction;
                         city.mark = new google.maps.Marker({
                             position: {lat: city.lat, lng: city.lng},
-                            title: city.name;
+                            title: city.name,
                             map: map
                         });
                         cities.push(city);
