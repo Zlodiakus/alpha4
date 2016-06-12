@@ -9,36 +9,34 @@
     <meta name="google-signin-client_id" content="818299087088-ooq951dsv5btv7361u4obhlse0apt3al.apps.googleusercontent.com">
 
     <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300&subset=latin,cyrillic' rel='stylesheet' type='text/css'/>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"/>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key="/>
 
     <meta name="google-signin-client_id" content="818299087088-ooq951dsv5btv7361u4obhlse0apt3al.apps.googleusercontent.com">
 </head>
 
 <script>
 function initialize() {
-   lat=47.2584933;
-   lng=39.7722394;
- var mapOptions = {
-    zoom: 1,
-    center: new google.maps.LatLng(lat, lng)
-  };
-
-  map = new google.maps.Map(document.getElementById('map-canvas'),
-      mapOptions);
-targetRect= new google.maps.Rectangle({
-    strokeColor: '#FF0000',
-    strokeOpacity: 0.8,
-    strokeWeight: 2,
-    fillColor: '#FF0000',
-    fillOpacity: 0.35,
-    map: map,
-    bounds: {
-      north: 0,
-      south: 1,
-      east: 1,
-      west: 0
-    }});
-
+    lat=47.2584933;
+    lng=39.7722394;
+    var mapOptions = {
+        zoom: 1,
+        center: new google.maps.LatLng(lat, lng)
+    };
+    map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
+    targetRect= new google.maps.Rectangle({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        map: map,
+        bounds: {
+            north: 0,
+            south: 1,
+            east: 1,
+            west: 0
+        }
+    });
 }
 
 
@@ -61,7 +59,7 @@ function getXmlHttp(){
 
 var xmlhttp= getXmlHttp();
 var token='0';
-var refreshL=function()
+var refresh=function()
 {
     var map_bounds=map.getBounds();
 	var minlat=map_bounds.getSouthWest().lat()*1E6;
@@ -115,6 +113,6 @@ function signOut() {
 </script>
 <body>
 <div id="map-canvas" style='z-index:1'></div>
-<div id="LoginZone" style='z-index:100;position:absolute'><div class="g-signin2" data-onsuccess="onSignIn"></div></div>
+<!--<div id="LoginZone" style='z-index:100;position:absolute'><div class="g-signin2" data-onsuccess="onSignIn"></div></div>-->
 </body>
 </html>
