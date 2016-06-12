@@ -160,7 +160,7 @@ public class intel {
             //Проверка пользователя
             //pstmt = con.prepareStatement("SELECT PGUID from Connections WHERE Token=?");
             pstmt = con.prepareStatement("SELECT PGUID from Users WHERE Login='Shadilan'");
-            pstmt.setString(1,token);
+            //pstmt.setString(1,token);
             ResultSet rs = pstmt.executeQuery();
             if (rs.isBeforeFirst()){
                 rs.next();
