@@ -9,7 +9,7 @@
     <meta name="google-signin-client_id" content="818299087088-ooq951dsv5btv7361u4obhlse0apt3al.apps.googleusercontent.com">
 
     <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300&subset=latin,cyrillic' rel='stylesheet' type='text/css'/>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key="/>
+    <script src="https://maps.googleapis.com/maps/api/js"/>
 
     <meta name="google-signin-client_id" content="818299087088-ooq951dsv5btv7361u4obhlse0apt3al.apps.googleusercontent.com">
 </head>
@@ -112,7 +112,8 @@ function signOut() {
   }
 </script>
 <body>
+<div id="LoginZone" style='z-index:100;position:absolute'><div class="g-signin2" data-onsuccess="onSignIn"></div></div>
 <div id="map-canvas" style='z-index:1'></div>
-<!--<div id="LoginZone" style='z-index:100;position:absolute'><div class="g-signin2" data-onsuccess="onSignIn"></div></div>-->
+
 </body>
 </html>
