@@ -62,6 +62,7 @@ function authorize(googleToken){
                 var a=JSON.parse(xmlhttp.responseText);
                 token=a.Token;
                 console.log(xmlhttp.responseText);
+                getData();
             } else
             console.log(xmlhttp);
         }
