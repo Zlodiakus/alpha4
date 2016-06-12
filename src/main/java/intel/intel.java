@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -45,7 +46,7 @@ public class intel {
         } catch (Exception e){
             JSONObject obj = new JSONObject();
             obj.put("Result", "U0000");
-            obj.put("Message", e.toString());
+            obj.put("Message", e.toString()+" "+ Arrays.toString(e.getStackTrace()));
             result = obj.toJSONString();
         }
         return result;
@@ -328,7 +329,7 @@ public class intel {
         catch (Exception e){
             JSONObject obj=new JSONObject();
             obj.put("Error","U0000");
-            obj.put("Message",e.toString());
+            obj.put("Message",e.toString()+" "+ Arrays.toString(e.getStackTrace()));
             result=obj.toJSONString();
         }
         return result;
