@@ -53,16 +53,18 @@ var token='0';
 
 function authorize(googleToken){
     xmlhttp = getXmlHttp();
+    console.log("/intel/api.jsp?ReqName=Authorize&GoogleToken="+googleToken);
     xmlhttp.open('GET',"/intel/api.jsp?ReqName=Authorize&GoogleToken="+googleToken, true);
     xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4) {
             if(xmlhttp.status == 200) {
                 console.log(xmlhttp.responseText);
-            }
+            } else
+            console.log(xmlhttp);
         }
-        xmlhttp.send();
     }
+    xmlhttp.send();
 }
 
 
