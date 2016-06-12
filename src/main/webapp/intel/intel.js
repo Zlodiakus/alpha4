@@ -88,37 +88,35 @@ function getData(){
             if (xmlhttp.readyState == 4) {
                 if(xmlhttp.status == 200) {
                     var data=JSON.parse(xmlhttp.responseText);
+                    //Загрузка игрока
                     player.gold=data.Gold;
                     player.race=data.Race;
                     player.GUID=data.GUID;
                     player.exp=data.Exp;
                     player.name=data.Name;
+                    //Jxbcnrf ujhljd tckb jyb tcnm/
                     if (cities!=null){
                         cities.forEach(function(currentVal,index,arr){
                            currentVal.mark.setMap(null);
                         });
-                        cities=null;
-                        data.Cities.forEach(function(currentVal,index,arr){
-                          var city={};
-                          city.lat=currentVal.Lat/1e6;
-                          city.lng=currentVal.Lng/1e6;
-                          city.level=currentVal.Level;
-                          city.up=currentVal.Upgrade;
-                          city.name=currentVal.Name;
-                          city.race=currentVal.Faction;
-                          city.mark = new google.maps.Marker({
-                              position: {lat: city.lat, lng: city.lng},
-                              title: city.name;
-                              map: map
-                            });
-                            cities.push(city);
-
-                        })
                     }
-                    for ()
-                    console.log(data);
+                    cities=[];
+                    data.Cities.forEach(function(currentVal,index,arr){
+                        var city={};
+                        city.lat=currentVal.Lat/1e6;
+                        city.lng=currentVal.Lng/1e6;
+                        city.level=currentVal.Level;
+                        city.up=currentVal.Upgrade;
+                        city.name=currentVal.Name;
+                        city.race=currentVal.Faction;
+                        city.mark = new google.maps.Marker({
+                            position: {lat: city.lat, lng: city.lng},
+                            title: city.name;
+                            map: map
+                        });
+                        cities.push(city);
 
-                    console.log(xmlhttp.responseText);
+                     })
                 } else
                 console.log(xmlhttp);
             }
