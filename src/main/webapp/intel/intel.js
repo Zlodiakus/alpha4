@@ -59,12 +59,41 @@ function authorize(googleToken){
     xmlhttp.onreadystatechange = function() {
         if (xmlhttp.readyState == 4) {
             if(xmlhttp.status == 200) {
+                var a=JSON.parse(xmlhttp.responseText);
+                token=a.Token;
                 console.log(xmlhttp.responseText);
             } else
             console.log(xmlhttp);
         }
     }
     xmlhttp.send();
+}
+
+var data;
+
+function getData(){
+    if (token!='0' && token!=''){
+        var map_bounds=map.getBounds();
+    	var minlat=map_bounds.getSouthWest().lat()*1E6;
+    	var minlng=map_bounds.getSouthWest().lng()*1E6;
+    	var maxlat=map_bounds.getNorthEast().lat()*1E6;
+    	var maxlng=map_bounds.getNorthEast().lng()*1E6;
+        xmlhttp = getXmlHttp();
+        console.log("/intel/api.jsp?ReqName=GetData&Token="+token+"&Lat1="+minlat+"&Lng1="+minlng+"&Lat2="+maxlat+"&Lng2="+maxlng);
+        xmlhttp.open("/intel/api.jsp?ReqName=GetData&Token="+token+"&Lat1="+minlat+"&Lng1="+minlng+"&Lat2="+maxlat+"&Lng2="+maxlng, true);
+        xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == 4) {
+                if(xmlhttp.status == 200) {
+                    var data=JSON.parse(xmlhttp.responseText);
+                    console.log(data);
+                    console.log(xmlhttp.responseText);
+                } else
+                console.log(xmlhttp);
+            }
+        }
+        xmlhttp.send();
+    }
 }
 
 

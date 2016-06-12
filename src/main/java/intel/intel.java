@@ -158,9 +158,9 @@ public class intel {
 
             con = DBUtils.ConnectDB();
             //Проверка пользователя
-            //pstmt = con.prepareStatement("SELECT PGUID from Connections WHERE Token=?");
-            //pstmt.setString(1,token);
-            pstmt = con.prepareStatement("SELECT GUID from Users WHERE Login='Shadilan'");
+            pstmt = con.prepareStatement("SELECT PGUID from Connections WHERE Token=?");
+            pstmt.setString(1,token);
+            //pstmt = con.prepareStatement("SELECT GUID from Users WHERE Login='Shadilan'");
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.isBeforeFirst()){
