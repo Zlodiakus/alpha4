@@ -2,6 +2,6 @@
     pageEncoding="UTF8"%>
     <%@page import="intel.intel"%>
 <%
-String result=Main.<>(request);
+String result=intel.intel(request);
 %>
 <%=result%>
