@@ -20,26 +20,33 @@ import java.util.UUID;
 public class intel {
     public static String getRequest(HttpServletRequest request){
         String result="";
-        //Определить тип запроса.
-        String reqName=request.getParameter("ReqName");
-        switch (reqName){
-            case "Authorize":
-                String googleToken=request.getParameter("GoogleToken");
-                result=doIntelAuthorize(googleToken);
-                break;
-            case "GetData":
-                String token=request.getParameter("Token");
-                int lat1=Integer.parseInt(request.getParameter("StartLat"));
-                int lng1=Integer.parseInt(request.getParameter("StartLng"));
-                int lat2=Integer.parseInt(request.getParameter("FinishLat"));
-                int lng2=Integer.parseInt(request.getParameter("FinishLng"));
-                result=getData(token,lat1,lng1,lat2,lng2);
-                break;
-            default:
-                JSONObject obj=new JSONObject();
-                obj.put("Result","I0101");
-                obj.put("Message","Operation not found");
-                result=obj.toJSONString();
+        try {
+            //Определить тип запроса.
+            String reqName = request.getParameter("ReqName");
+            switch (reqName) {
+                case "Authorize":
+                    String googleToken = request.getParameter("GoogleToken");
+                    result = doIntelAuthorize(googleToken);
+                    break;
+                case "GetData":
+                    String token = request.getParameter("Token");
+                    int lat1 = Integer.parseInt(request.getParameter("StartLat"));
+                    int lng1 = Integer.parseInt(request.getParameter("StartLng"));
+                    int lat2 = Integer.parseInt(request.getParameter("FinishLat"));
+                    int lng2 = Integer.parseInt(request.getParameter("FinishLng"));
+                    result = getData(token, lat1, lng1, lat2, lng2);
+                    break;
+                default:
+                    JSONObject obj = new JSONObject();
+                    obj.put("Result", "I0101");
+                    obj.put("Message", "Operation not found");
+                    result = obj.toJSONString();
+            }
+        } catch (Exception e){
+            JSONObject obj = new JSONObject();
+            obj.put("Result", "U0000");
+            obj.put("Message", e.toString());
+            result = obj.toJSONString();
         }
         return result;
     }
