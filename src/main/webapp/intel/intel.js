@@ -113,11 +113,11 @@ function getData(){
                         city.up=currentVal.Upgrade;
                         city.name=currentVal.Name;
                         city.race=currentVal.Faction;
-
+                        var pic="intel/img/city_"+Math.round(city.level/2)+".png";
                         city.mark = new google.maps.Marker({
                             position: {lat: city.lat, lng: city.lng},
                             title: city.name,
-                            icon: "intel/img/city_"+Math.round(city.level/2)+".png",
+                            icon: pic,
                             map: map
                         });
                         cities.push(city);
