@@ -117,7 +117,7 @@ function getData(){
                         city.mark = new google.maps.Marker({
                             position: {lat: city.lat, lng: city.lng},
                             title: city.name,
-                            icon: "intel/img/city_"+(city.level/2);
+                            icon: "intel/img/city_"+Math.round(city.level/2);
                             map: map
                         });
                         cities.push(city);
