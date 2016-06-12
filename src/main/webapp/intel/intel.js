@@ -56,12 +56,13 @@ function authorize(googleToken){
     xmlhttp.open('GET',"/intel/api.jsp?ReqName=Authorize&GoogleToken="+googleToken, true);
     xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xmlhttp.onreadystatechange = function() {
-    if (xmlhttp.readyState == 4) {
-        if(xmlhttp.status == 200) {
-            console.log(xmlhttp.responseText);
+        if (xmlhttp.readyState == 4) {
+            if(xmlhttp.status == 200) {
+                console.log(xmlhttp.responseText);
+            }
         }
+        xmlhttp.send();
     }
-    xmlhttp.send();
 }
 
 
