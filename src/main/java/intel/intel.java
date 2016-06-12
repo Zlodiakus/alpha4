@@ -151,7 +151,7 @@ public class intel {
     private static String getData(String token,int Lat1,int Lng1,int Lat2,int Lng2){
         String result="";
         String pguid="";
-        Connection con;
+        Connection con=null;
         PreparedStatement pstmt;
         //Проверить токен
         try {
@@ -343,6 +343,12 @@ public class intel {
             obj.put("Message",e.toString()+" "+ Arrays.toString(e.getStackTrace()));
             result=obj.toJSONString();
         }
+        try {
+            if (con!=null && !con.isClosed()) con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return result;
     }
 }
