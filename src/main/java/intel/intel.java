@@ -328,7 +328,7 @@ public class intel {
         catch (Exception e){
             JSONObject obj=new JSONObject();
             obj.put("Error","U0000");
-            obj.put("Message","Unexpected error getting data");
+            obj.put("Message",e.toString());
             result=obj.toJSONString();
         }
         return result;
