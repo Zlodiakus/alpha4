@@ -267,9 +267,8 @@ public class intel {
                         ambushes.add(obj);
                     }
                     robj.put("Ambushes",ambushes);
-                    pstmt=con.prepareStatement("SELECT GUID,Lat , Lng , c.Name, c.Level, p.Name founder, u.Name, \n" +
-                            "CASE \n" +
-                            "WHEN Influence1 > Influence2\n" +
+                    pstmt=con.prepareStatement("SELECT c.GUID, ob.Lat, ob.Lng, c.Name, c.Level, p.Name founder, u.Name, \n" +
+                            "CASE WHEN Influence1 > Influence2\n" +
                             "AND Influence1 > Influence3\n" +
                             "THEN  '1'\n" +
                             "WHEN Influence2 > Influence1\n" +
@@ -279,17 +278,19 @@ public class intel {
                             "AND Influence3 > Influence2\n" +
                             "THEN  '3'\n" +
                             "ELSE  '0'\n" +
-                            "END faction \n" +
-                            ",Influence1 ,Influence2, Influence3"+
-                            ",Owner "+
+                            "END faction, Influence1, Influence2, Influence3\n" +
                             "FROM GameObjects ob, Cities c, Players p, Upgrades u\n" +
                             "WHERE c.GUID = ob.GUID\n" +
                             "AND ob.Type =  'City'\n" +
                             "AND p.guid = c.creator\n" +
                             "AND c.UpgradeType = u.Type\n" +
-                            "AND u.level =0" +
-                            "AND g.Lat between ? and ?"+
-                            "AND g.Lng between ? and ?");
+                            "AND u.level =0\n" +
+                            "AND ob.Lat\n" +
+                            "BETWEEN ? \n" +
+                            "AND ? \n" +
+                            "AND ob.Lng\n" +
+                            "BETWEEN ? \n" +
+                            "AND ? ");
                     pstmt.setInt(1, Lat1);
                     pstmt.setInt(2,Lat2);
                     pstmt.setInt(3,Lng1);
