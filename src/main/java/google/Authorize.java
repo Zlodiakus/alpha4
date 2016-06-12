@@ -99,50 +99,7 @@ public class Authorize {
         return result;
     }
 
-    private static String doIntelAuthorize(HttpServletRequest request) {
-        String result;
-        //Получение параметров
-        String googleToken=request.getParameter("GoogleToken");
-        //String hash=request.getParameter("hash");
-        //String version=request.getParameter("version");
-        //Проверка Версии Вернуть в будущем
-        /*if (!Version.checkVersion(version)) {
-            JSONObject jsObject = (new JSONObject());
-            jsObject.put("Error", "L0203");
-            jsObject.put("Message", "Версия не поддерживается");
-            jsObject.put("Detail", version);
-            result = jsObject.toJSONString();
-            return result;
-        }*/
 
-        //Проверка токена
-        String email=Verify.checkID(googleToken);
-        if (email.charAt(0)=='~') {
-            JSONObject jsObject = (new JSONObject());
-            jsObject.put("Error", "L0201");
-            jsObject.put("Message", "Token не распознан");
-            jsObject.put("Detail", email);
-            result = jsObject.toJSONString();
-            return result;
-        }
-        //Получение токена приложения
-        String token=getIntelToken(email);
-        JSONObject jsObject = (new JSONObject());
-        switch (token){
-            case "L0202":
-                jsObject.put("Error","L0202");
-                jsObject.put("Message", "Пользователь не найден");
-                break;
-            case "U0000":
-                jsObject.put("Error", "U0000");
-                jsObject.put("Message", token);
-                break;
-            default:
-                jsObject.put("Token",token);
-        }
-        result = jsObject.toJSONString();
-        return result;
-    }
 
     private static String doRegister(HttpServletRequest request){
         String result;
@@ -339,71 +296,6 @@ public class Authorize {
         return result;
     }
 
-    private static String getIntelToken(String email)  {
-        PreparedStatement pstmt,query;
-        String Token = "T" + UUID.randomUUID().toString();
-        String PGUID;
-        String result="Not Changed";
-        Connection con= null;
-        try {
-            con = DBUtils.ConnectDB();
 
-            //Проверка пользователя
-            pstmt = con.prepareStatement("SELECT GUID,Login from Users WHERE email=?");
-            pstmt.setString(1, email);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.isBeforeFirst()) {
-                rs.next();
-                PGUID = rs.getString(1);
-                String login=rs.getString(2);
-                //Проверка игрока
-                query=con.prepareStatement("select count(1) from Players where GUID=?");
-                query.setString(1,PGUID);
-                ResultSet rs2=query.executeQuery();
-                rs2.first();
-                //Создание игрока если нет
-                if (rs2.getInt(1)==0) {
-                    query=con.prepareStatement("insert into Players (GUID, Name, Level, Exp, Gold,Class, Race) values (?,?,1,0,0,0,0)");
-                    query.setString(1, PGUID);
-                    query.setString(2, login);
-                    query.execute();
-                    query=con.prepareStatement("insert into Stats (PGUID) values (?)");
-                    query.setString(1, PGUID);
-                    query.execute();
-                    query=con.prepareStatement("insert into GameObjects (GUID, Lat, Lng, Type) values (?,100,100,'Player')");
-                    query.setString(1, PGUID);
-                    query.execute();
-                    query = con.prepareStatement("insert into PUpgrades(PGUID,UGUID) SELECT ?,u.GUID from Upgrades u WHERE level=0");
-                    query.setString(1, PGUID);
-                    query.execute();
-                    con.commit();
-                }
-                rs2.close();
-                query.close();
-                //Очистка старых коннектов
-                pstmt = con.prepareStatement("DELETE FROM Connections WHERE CurrentDate<ADDDATE( CURRENT_TIMESTAMP( ) , INTERVAL -1\n" +
-                        "DAY )");
-                pstmt.execute();
-                pstmt = con.prepareStatement("INSERT into Connections (PGUID,Token,TokenType) Values(?,?,'I')");
-                pstmt.setString(1, PGUID);
-                pstmt.setString(2, Token);
-                pstmt.execute();
-                pstmt.close();
-                con.commit();
-                result=Token;
-
-            } else {
-                result="L0202";
-            }
-        } catch (NamingException | SQLException e) {
-            result=e.toString();
-        }
-        try {
-            if (con!=null && !con.isClosed()) con.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return result;
-    }
 
 }

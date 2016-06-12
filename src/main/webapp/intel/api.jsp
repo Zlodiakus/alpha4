@@ -1,0 +1,7 @@
+<%@ page language="java" contentType="text/plain; charset=UTF8"
+    pageEncoding="UTF8"%>
+    <%@page import="intel.intel"%>
+<%
+String result=Main.<>(request);
+%>
+<%=result%>
