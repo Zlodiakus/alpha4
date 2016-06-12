@@ -114,10 +114,20 @@ function getData(){
                         city.name=currentVal.Name;
                         city.race=currentVal.Faction;
                         var pic="intel/img/city_"+Math.round(city.level/2)+".png";
+                        var image = {
+                            url: pic,
+                            // This marker is 20 pixels wide by 32 pixels high.
+                            size: new google.maps.Size(192, 192),
+                            // The origin for this image is (0, 0).
+                            origin: new google.maps.Point(0, 0),
+                            // The anchor for this image is the base of the flagpole at (0, 32).
+                            anchor: new google.maps.Point(0, 32),
+                            scaledSize: new google.maps.Size(25, 25)
+                          };
                         city.mark = new google.maps.Marker({
                             position: {lat: city.lat, lng: city.lng},
                             title: city.name,
-                            icon: pic,
+                            icon: image,
                             map: map
                         });
                         cities.push(city);
