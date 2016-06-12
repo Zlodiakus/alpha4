@@ -291,22 +291,27 @@ public class intel {
                             "AND g.Lat between ? and ?"+
                             "AND g.Lng between ? and ?");
                     pstmt.setString(1,pguid);
+                    pstmt.setInt(1, Lat1);
+                    pstmt.setInt(1,Lat2);
+                    pstmt.setInt(1,Lng1);
+                    pstmt.setInt(1,Lng2);
+
                     rs=pstmt.executeQuery();
                     JSONArray cities=new JSONArray();
                     while (rs.next()){
                         JSONObject obj=new JSONObject();
                         obj.put("GUID",rs.getString(1));
-                        obj.put("Lat",rs.getInt(6));
-                        obj.put("Lng",rs.getInt(7));
-                        obj.put("Name",rs.getString(1));
-                        obj.put("Level",rs.getInt(2));
+                        obj.put("Lat",rs.getInt(2));
+                        obj.put("Lng",rs.getInt(3));
+                        obj.put("Name",rs.getString(4));
+                        obj.put("Level",rs.getInt(5));
                         obj.put("Founder",rs.getString(6));
-                        obj.put("Upgrade",rs.getString(6));
-                        obj.put("Faction",rs.getString(6));
-                        obj.put("Inf1",rs.getInt(3));
-                        obj.put("Inf2",rs.getInt(3));
-                        obj.put("Inf3",rs.getInt(3));
-                        obj.put("Owner",rs.getInt(3));
+                        obj.put("Upgrade",rs.getString(7));
+                        obj.put("Faction",rs.getString(8));
+                        obj.put("Inf1",rs.getInt(9));
+                        obj.put("Inf2",rs.getInt(10));
+                        obj.put("Inf3",rs.getInt(11));
+                        obj.put("Owner",rs.getInt(12));
 
                         cities.add(obj);
                     }
