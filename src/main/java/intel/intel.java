@@ -159,8 +159,9 @@ public class intel {
             con = DBUtils.ConnectDB();
             //Проверка пользователя
             //pstmt = con.prepareStatement("SELECT PGUID from Connections WHERE Token=?");
-            pstmt = con.prepareStatement("SELECT GUID from Users WHERE Login='Shadilan'");
             //pstmt.setString(1,token);
+            pstmt = con.prepareStatement("SELECT GUID from Users WHERE Login='Shadilan'");
+
             ResultSet rs = pstmt.executeQuery();
             if (rs.isBeforeFirst()){
                 rs.next();
@@ -201,6 +202,7 @@ public class intel {
                     int Gold=rs.getInt(4);
                     int Race=rs.getInt(5);
                     JSONObject robj=new JSONObject();
+                    robj.put("GUID",pguid);
                     robj.put("Name",Name);
                     robj.put("Exp",Exp);
                     robj.put("Gold",Gold);
@@ -209,6 +211,7 @@ public class intel {
                     pstmt=con.prepareStatement("SELECT Type,Name,Level,Description from PUpgrades pu,Upgrades u " +
                             "where u.GUID=pu.UGUID and pu.PGUID=?");
                             pstmt.setString(1,pguid);
+                    rs=pstmt.executeQuery();
                     while (rs.next()){
                         JSONObject obj=new JSONObject();
                         obj.put("Type",rs.getString(2));
@@ -227,6 +230,7 @@ public class intel {
                             "AND cf.GUID = gcf.GUID\n" +
                             "AND c.PGUID=?");
                     pstmt.setString(1,pguid);
+                    rs=pstmt.executeQuery();
                     JSONArray routes=new JSONArray();
                     while (rs.next()){
                         JSONObject obj=new JSONObject();
@@ -249,6 +253,7 @@ public class intel {
                             "WHERE g.GUID = a.GUID " +
                             "and a.PGUID=?");
                     pstmt.setString(1,pguid);
+                    rs=pstmt.executeQuery();
                     JSONArray ambushes=new JSONArray();
                     while (rs.next()){
                         JSONObject obj=new JSONObject();
@@ -286,6 +291,7 @@ public class intel {
                             "AND g.Lat between ? and ?"+
                             "AND g.Lng between ? and ?");
                     pstmt.setString(1,pguid);
+                    rs=pstmt.executeQuery();
                     JSONArray cities=new JSONArray();
                     while (rs.next()){
                         JSONObject obj=new JSONObject();
