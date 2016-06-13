@@ -15,6 +15,7 @@
 
     </script>
     <meta charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta name="google-signin-client_id"
           content="818299087088-ooq951dsv5btv7361u4obhlse0apt3al.apps.googleusercontent.com">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300&subset=latin,cyrillic' rel='stylesheet'
@@ -25,7 +26,8 @@
 </head>
 <body>
 <div id="LoginZone" style="position:absolute;z-index:100;top:10px; left:50%;">
-    <div class="g-signin2" data-onsuccess="onSignIn"> <button onclick="setPos">+</button></div>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+<div id="PosDiv" style="position:absolute;z-index:100;top:10px; right:10%;"><input type="button" onclick="setPos">+</input></div>
 </div>
 <div id="map-canvas" style="z-index:1;">Intel Caravans</div>
 </body>

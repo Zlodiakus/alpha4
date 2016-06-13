@@ -29,7 +29,6 @@ function initialize(){
     };
     map =new  google.maps.Map(document.getElementById("map-canvas"),mapOptions);
     map.addListener('bounds_changed',function(){
-        //console.log(map.getZoom());
         getData();
 
     })
@@ -41,11 +40,6 @@ function onSignIn(googleUser) {
             var profile = googleUser.getBasicProfile();
             var id_token = googleUser.getAuthResponse().id_token;
             authorize(id_token);
-            console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-            console.log('Name: ' + profile.getName());
-  console.log('Image URL: ' + profile.getImageUrl());
-  console.log('Email: ' + profile.getEmail());
-  //document.getElementById("LoginZone").innerHTML="<button onClick='signOut()'>Выход</button>";
 }
 
 function signOut() {
@@ -58,7 +52,6 @@ var token='0';
 
 function authorize(googleToken){
     xmlhttp = getXmlHttp();
-    console.log("/intel/api.jsp?ReqName=Authorize&GoogleToken="+googleToken);
     xmlhttp.open('GET',"/intel/api.jsp?ReqName=Authorize&GoogleToken="+googleToken, true);
     xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     xmlhttp.onreadystatechange = function() {
@@ -66,7 +59,7 @@ function authorize(googleToken){
             if(xmlhttp.status == 200) {
                 var a=JSON.parse(xmlhttp.responseText);
                 token=a.Token;
-                console.log(xmlhttp.responseText);
+
                 getData();
             } else
             console.log(xmlhttp);
@@ -88,7 +81,6 @@ function getData(){
     	var maxlat=Math.round(map_bounds.getNorthEast().lat()*1E6);
     	var maxlng=Math.round(map_bounds.getNorthEast().lng()*1E6);
         xmlhttp = getXmlHttp();
-        console.log("/intel/api.jsp?ReqName=GetData&Token="+token+"&StartLat="+minlat+"&StartLng="+minlng+"&FinishLat="+maxlat+"&FinishLng="+maxlng);
         xmlhttp.open('GET',"/intel/api.jsp?ReqName=GetData&Token="+token+"&StartLat="+minlat+"&StartLng="+minlng+"&FinishLat="+maxlat+"&FinishLng="+maxlng, true);
         xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xmlhttp.onreadystatechange = function() {
