@@ -163,7 +163,7 @@ function getData(){
                         position:{lat: city.lat, lng: city.lng}
                         });
                         google.maps.event.addListener(city.mark, 'click', function () {
-                                        infoWindow.open(map, this);
+                                        city.infoWindow.open(map, this);
                                     });
                         cities.push(city);
 
@@ -214,13 +214,13 @@ function getData(){
                          });
                          if (map.getZoom()<15) ambushe.circle.setVisible(false);
                          ambushe.infoWindow = new google.maps.InfoWindow({
-                         content:"<table><tr><td>Название:</td><td>"+ambushe.name+" "+city.level+"</td></tr>"+
+                         content:"<table><tr><td>Название:</td><td>"+ambushe.name+"</td></tr>"+
                          "<tr><td>Наемников:</td><td>"+ambushe.life+"</td></tr>"+
                          "<tr><td>Стоит:</td><td>"+ambushe.tts+"</td></tr></table>",
                          position:{lat: ambushe.lat, lng: ambushe.lng}
                          });
                          google.maps.event.addListener(ambushe.mark, 'click', function () {
-                                         infoWindow.open(map, this);
+                                         ambushe.infoWindow.open(map, this);
                                      });
                          ambushes.push(ambushe);
 
