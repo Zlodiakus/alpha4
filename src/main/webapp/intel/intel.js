@@ -126,7 +126,7 @@ function getData(){
                             origin: new google.maps.Point(0, 0),
                             // The anchor for this image is the base of the flagpole at (0, 32).
                             anchor: new google.maps.Point(0, 32),
-                            scaledSize: new google.maps.Size(64, 64)
+                            scaledSize: new google.maps.Size(size, size)
                           };
                         city.mark = new google.maps.Marker({
                             position: {lat: city.lat, lng: city.lng},
