@@ -29,6 +29,7 @@ function initialize(){
     };
     map =new  google.maps.Map(document.getElementById("map-canvas"),mapOptions);
     map.addListener('bounds_changed',function(){
+        //console.log(map.getZoom());
         getData();
 
     })
@@ -114,6 +115,9 @@ function getData(){
                         city.name=currentVal.Name;
                         city.race=currentVal.Faction;
                         var pic="intel/img/city_"+Math.round(city.level/2)+".png";
+                        var size=6;
+                        if (city.level==1) size=4;
+                        size=size*(map.getZoom()+1);
                         var image = {
                             url: pic,
                             // This marker is 20 pixels wide by 32 pixels high.
