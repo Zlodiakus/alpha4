@@ -29,7 +29,7 @@ function initialize(){
     };
     map =new  google.maps.Map(document.getElementById("map-canvas"),mapOptions);
     map.addListener('bounds_changed',function(){
-        //console.log(map.getZoom());
+        console.log(map.getZoom());
         getData();
 
     })
@@ -78,6 +78,7 @@ function authorize(googleToken){
 var player={};
 var cities=[];
 var ambushes=[];
+var routes=[];
 
 function getData(){
     if (token!='0' && token!=''){
@@ -146,6 +147,7 @@ function getData(){
                             strokeColor:'#0000ff',
                             map:map
                         });
+                        if (map.getZoom<15) city.circle.setVisible(false);
                         cities.push(city);
 
                      });
@@ -193,6 +195,7 @@ function getData(){
                              strokeColor:'#ff0000',
                              map:map
                          });
+                         if (map.getZoom<15) ambushe.circle.setVisible(false);
                          ambushes.push(ambushe);
 
                       })
