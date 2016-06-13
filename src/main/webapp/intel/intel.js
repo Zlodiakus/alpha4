@@ -213,7 +213,7 @@ function getData(){
                              map:map
                          });
                          if (map.getZoom()<15) ambushe.circle.setVisible(false);
-                         city.infoWindow = new google.maps.InfoWindow({
+                         ambushe.infoWindow = new google.maps.InfoWindow({
                          content:"<table><tr><td>Название:</td><td>"+ambushe.name+" "+city.level+"</td></tr>"+
                          "<tr><td>Наемников:</td><td>"+ambushe.life+"</td></tr>"+
                          "<tr><td>Стоит:</td><td>"+ambushe.tts+"</td></tr></table>",
