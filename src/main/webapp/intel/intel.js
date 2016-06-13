@@ -283,5 +283,12 @@ function getData(){
     }
 }
 
+function setPos()
+{
+ if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    }
+
+}
 
 
