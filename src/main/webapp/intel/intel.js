@@ -119,7 +119,7 @@ function getData(){
                         city.race=currentVal.Faction;
                         var pic="intel/img/city_"+Math.round(city.level/2)+".png";
                         var size=6;
-                        if (city.level==<3) size=2; //Поселки маленькие
+                        if (city.level<3) size=2; //Поселки маленькие
                         size=size*(map.getZoom()+1);
                         var image = {
                             url: pic,
@@ -140,7 +140,7 @@ function getData(){
 
                         city.radius=100+5*(city.level - 1);
                         city.circle= new google.maps.Circle({
-                            center{lat: city.lat, lng: city.lng},
+                            center:{lat: city.lat, lng: city.lng},
                             radius:city.radius,
                             strokeColor:'#0000ff',
                             map:map
@@ -186,7 +186,7 @@ function getData(){
                          });
 
                          ambushe.circle= new google.maps.Circle({
-                             center{lat: ambushe.lat, lng: ambushe.lng},
+                             center:{lat: ambushe.lat, lng: ambushe.lng},
                              radius:ambush.radius,
                              strokeColor:'#ff0000',
                              map:map
