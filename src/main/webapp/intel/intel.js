@@ -72,7 +72,7 @@ var player={};
 var cities=[];
 var ambushes=[];
 var routes=[];
-
+var infoWindow=new google.maps.InfoWindow();
 function getData(){
     if (token!='0' && token!=''){
         var map_bounds=map.getBounds();
@@ -145,17 +145,16 @@ function getData(){
                             map:map
                         });
                         if (map.getZoom()<15) city.circle.setVisible(false);
-                        city.infoWindow = new google.maps.InfoWindow({
-                        content:"<table><tr><td>Название:</td><td>"+city.name+" "+city.level+"</td></tr>"+
+                        city.info = "<table><tr><td>Название:</td><td>"+city.name+" "+city.level+"</td></tr>"+
                         "<tr><td>Основатель:</td><td>"+city.founder+"</td></tr>"+
                         "<tr><td>Умение:</td><td>"+city.up+"</td></tr>"+
                         "<tr><td>Гильдия:</td><td><progress max='"+city.infmax+"' value='"+city.inf1+"'/></td></tr>"+
                         "<tr><td>Альянс:</td><td><progress max='"+city.infmax+"' value='"+city.inf2+"'/></td></tr>"+
-                        "<tr><td>Союз:</td><td><progress max='"+city.infmax+"' value='"+city.inf3+"'/></td></tr></table>",
-                        position:{lat: city.lat, lng: city.lng}
-                        });
+                        "<tr><td>Союз:</td><td><progress max='"+city.infmax+"' value='"+city.inf3+"'/></td></tr></table>";
+
                         google.maps.event.addListener(city.mark, 'click', function () {
-                                        city.infoWindow.open(map, this);
+                                        infoWindow.setContent(city.info);
+                                        infoWindow.open(map, this);
                                     });
                         cities.push(city);
 
@@ -205,14 +204,13 @@ function getData(){
                              map:map
                          });
                          if (map.getZoom()<15) ambushe.circle.setVisible(false);
-                         ambushe.infoWindow = new google.maps.InfoWindow({
-                         content:"<table><tr><td>Название:</td><td>"+ambushe.name+"</td></tr>"+
+                         ambushe.info = "<table><tr><td>Название:</td><td>"+ambushe.name+"</td></tr>"+
                          "<tr><td>Наемников:</td><td>"+ambushe.life+"</td></tr>"+
-                         "<tr><td>Стоит:</td><td>"+ambushe.tts+"</td></tr></table>",
-                         position:{lat: ambushe.lat, lng: ambushe.lng}
-                         });
+                         "<tr><td>Стоит:</td><td>"+ambushe.tts+"</td></tr></table>";
                          google.maps.event.addListener(ambushe.mark, 'click', function () {
-                                         ambushe.infoWindow.open(map, this);
+                                        infoWindow.setContent(ambushe.info);
+                                         infoWindow.open(map, this);
+                                         infoWindow.open(map, this);
                                      });
                          ambushes.push(ambushe);
 
@@ -245,7 +243,7 @@ function getData(){
                                // The origin for this image is (0, 0).
                                origin: new google.maps.Point(0, 0),
                                // The anchor for this image is the base of the flagpole at (0, 32).
-                               anchor: new google.maps.Point(0, 32),
+                               anchor: new google.maps.Point(size/2, size/2),
                                scaledSize: new google.maps.Size(size, size)
                              };
                            route.mark = new google.maps.Marker({
