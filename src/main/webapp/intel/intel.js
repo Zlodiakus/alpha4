@@ -283,4 +283,8 @@ function setPos()
 
 }
 
-
+function showPosition(position) {
+   lat=position.coords.latitude;
+   lng=position.coords.longitude;
+   map.setCenter({lat: lat, lng: lng});
+}
