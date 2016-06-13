@@ -29,7 +29,7 @@ function initialize(){
     };
     map =new  google.maps.Map(document.getElementById("map-canvas"),mapOptions);
     map.addListener('bounds_changed',function(){
-        console.log(map.getZoom());
+        //console.log(map.getZoom());
         getData();
 
     })
@@ -117,7 +117,12 @@ function getData(){
                         city.level=currentVal.Level;
                         city.up=currentVal.Upgrade;
                         city.name=currentVal.Name;
+                        city.founder=currentVal.Founder;
                         city.race=currentVal.Faction;
+                        city.infmax=currentVal.Inf1+currentVal.Inf2+currentVal.Inf3;
+                        city.inf1=currentVal.Inf1;
+                        city.inf2=currentVal.Inf2;
+                        city.inf3=currentVal.Inf3;
                         var pic="intel/img/city_"+Math.round(city.level/2)+".png";
                         var size=6;
                         if (city.level<3) size=2; //Поселки маленькие
@@ -147,7 +152,19 @@ function getData(){
                             strokeColor:'#0000ff',
                             map:map
                         });
-                        if (map.getZoom<15) city.circle.setVisible(false);
+                        if (map.getZoom()<15) city.circle.setVisible(false);
+                        city.infoWindow = new google.maps.InfoWindow({
+                        content:"<table><tr><td>Название:</td><td>"+city.name+" "+city.level+"</td></tr>"+
+                        "<tr><td>Основатель:</td><td>"+city.founder+"</td></tr>"+
+                        "<tr><td>Умение:</td><td>"+city.up+"</td></tr>"+
+                        "<tr><td>Гильдия:</td><td><progress max='"+city.infmax+"' value='"+city.inf1+"'/></td></tr>"+
+                        "<tr><td>Альянс:</td><td><progress max='"+city.infmax+"' value='"+city.inf2+"'/></td></tr>"+
+                        "<tr><td>Союз:</td><td><progress max='"+city.infmax+"' value='"+city.inf3+"'/></td></tr></table>",
+                        position:{lat: city.lat, lng: city.lng}
+                        });
+                        google.maps.event.addListener(city.mark, 'click', function () {
+                                        infoWindow.open(map, this);
+                                    });
                         cities.push(city);
 
                      });
@@ -195,7 +212,16 @@ function getData(){
                              strokeColor:'#ff0000',
                              map:map
                          });
-                         if (map.getZoom<15) ambushe.circle.setVisible(false);
+                         if (map.getZoom()<15) ambushe.circle.setVisible(false);
+                         city.infoWindow = new google.maps.InfoWindow({
+                         content:"<table><tr><td>Название:</td><td>"+ambushe.name+" "+city.level+"</td></tr>"+
+                         "<tr><td>Наемников:</td><td>"+ambushe.life+"</td></tr>"+
+                         "<tr><td>Стоит:</td><td>"+ambushe.tts+"</td></tr></table>",
+                         position:{lat: ambushe.lat, lng: ambushe.lng}
+                         });
+                         google.maps.event.addListener(ambushe.mark, 'click', function () {
+                                         infoWindow.open(map, this);
+                                     });
                          ambushes.push(ambushe);
 
                       })
@@ -236,7 +262,7 @@ function getData(){
                                icon: image,
                                map: map
                            });
-                           route.line= new google.maps.Circle({
+                           route.line= new google.maps.Polyline({
                                 geodesic:true,
                                 path:[{lat: route.slat, lng: route.slng},
                                     {lat: route.lat, lng: route.lng},
