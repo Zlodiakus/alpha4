@@ -77,6 +77,7 @@ function authorize(googleToken){
 
 var player={};
 var cities=[];
+var ambushes=[];
 
 function getData(){
     if (token!='0' && token!=''){
@@ -99,12 +100,14 @@ function getData(){
                     player.GUID=data.GUID;
                     player.exp=data.Exp;
                     player.name=data.Name;
-                    //Jxbcnrf ujhljd tckb jyb tcnm/
+                    //Очищаем города
                     if (cities!=null){
                         cities.forEach(function(currentVal,index,arr){
                            currentVal.mark.setMap(null);
+                           currentVal.circle.setMap(null);
                         });
                     }
+                    //Рисуем города
                     cities=[];
                     data.Cities.forEach(function(currentVal,index,arr){
                         var city={};
@@ -116,7 +119,7 @@ function getData(){
                         city.race=currentVal.Faction;
                         var pic="intel/img/city_"+Math.round(city.level/2)+".png";
                         var size=6;
-                        if (city.level==1) size=4;
+                        if (city.level==<3) size=2; //Поселки маленькие
                         size=size*(map.getZoom()+1);
                         var image = {
                             url: pic,
@@ -134,9 +137,113 @@ function getData(){
                             icon: image,
                             map: map
                         });
+
+                        city.radius=100+5*(city.level - 1);
+                        city.circle= new google.maps.Circle({
+                            center{lat: city.lat, lng: city.lng},
+                            radius:city.radius,
+                            strokeColor:'#0000ff',
+                            map:map
+                        });
                         cities.push(city);
 
-                     })
+                     });
+                     //Очищаем засады
+                     if (ambushes!=null){
+                         ambushes.forEach(function(currentVal,index,arr){
+                            currentVal.mark.setMap(null);
+                            currentVal.circle.setMap(null);
+                         });
+                     }
+                     //Рисуем рисуем засады
+                     ambushes=[];
+                     data.Ambushes.forEach(function(currentVal,index,arr){
+                         var ambushe={};
+                         ambushe.lat=currentVal.Lat/1e6;
+                         ambushe.lng=currentVal.Lng/1e6;
+                         ambushe.life=currentVal.Life*10;
+                         ambushe.tts=currentVal.TTS;
+                         ambushe.name=currentVal.Name;
+                         ambushe.radius=currentVal.Radius;
+                         var pic="intel/img/ambush.png";
+                         var size=2;
+                         size=size*(map.getZoom()+1);
+                         var image = {
+                             url: pic,
+                             // This marker is 20 pixels wide by 32 pixels high.
+                             size: new google.maps.Size(192, 192),
+                             // The origin for this image is (0, 0).
+                             origin: new google.maps.Point(0, 0),
+                             // The anchor for this image is the base of the flagpole at (0, 32).
+                             anchor: new google.maps.Point(0, 32),
+                             scaledSize: new google.maps.Size(size, size)
+                           };
+                         ambushe.mark = new google.maps.Marker({
+                             position: {lat: ambushe.lat, lng: ambushe.lng},
+                             title: ambushe.name,
+                             icon: image,
+                             map: map
+                         });
+
+                         ambushe.circle= new google.maps.Circle({
+                             center{lat: ambushe.lat, lng: ambushe.lng},
+                             radius:ambush.radius,
+                             strokeColor:'#ff0000',
+                             map:map
+                         });
+                         ambushes.push(ambushe);
+
+                      })
+                      //Очищаем маршруты
+                       if (routes!=null){
+                           routes.forEach(function(currentVal,index,arr){
+                              currentVal.mark.setMap(null);
+                              currentVal.line.setMap(null)
+                           });
+                       }
+                       //Рисуем маршруты
+                       routes=[];
+                       data.Routes.forEach(function(currentVal,index,arr){
+                           var route={};
+                           route.lat=currentVal.Lat/1e6;
+                           route.lng=currentVal.Lng/1e6;
+                           route.slat=currentVal.SLat/1e6;
+                           route.slng=currentVal.SLng/1e6;
+                           route.flat=currentVal.FLat/1e6;
+                           route.flng=currentVal.FLng/1e6;
+                           route.profit=currentVal.Profit;
+                           var pic="intel/img/caravan.png";
+                           var size=2;
+                           size=size*(map.getZoom()+1);
+                           var image = {
+                               url: pic,
+                               // This marker is 20 pixels wide by 32 pixels high.
+                               size: new google.maps.Size(192, 192),
+                               // The origin for this image is (0, 0).
+                               origin: new google.maps.Point(0, 0),
+                               // The anchor for this image is the base of the flagpole at (0, 32).
+                               anchor: new google.maps.Point(0, 32),
+                               scaledSize: new google.maps.Size(size, size)
+                             };
+                           route.mark = new google.maps.Marker({
+                               position: {lat: route.lat, lng: route.lng},
+                               title: route.name,
+                               icon: image,
+                               map: map
+                           });
+                           route.line= new google.maps.Circle({
+                                geodesic:true,
+                                path:[{lat: route.slat, lng: route.slng},
+                                    {lat: route.lat, lng: route.lng},
+                                    {lat: route.flat, lng: route.flng}],
+                                strokeColor:'#0000ff',
+                                map:map
+                           });
+
+                           routes.push(route);
+
+                        })
+
                 } else
                 console.log(xmlhttp);
             }
