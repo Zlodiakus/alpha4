@@ -45,13 +45,13 @@ function onSignIn(googleUser) {
             console.log('Name: ' + profile.getName());
   console.log('Image URL: ' + profile.getImageUrl());
   console.log('Email: ' + profile.getEmail());
-  document.getElementById("LoginZone").innerHTML="<button onClick='signOut()'>Выход</button>";
+  //document.getElementById("LoginZone").innerHTML="<button onClick='signOut()'>Выход</button>";
 }
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.signOut().then(function () {
-    document.getElementById("LoginZone").innerHTML='<div class="g-signin2" data-onsuccess="onSignIn">';});
+    //document.getElementById("LoginZone").innerHTML='<div class="g-signin2" data-onsuccess="onSignIn">';});
 }
 
 var token='0';
@@ -128,7 +128,7 @@ function getData(){
                             // The origin for this image is (0, 0).
                             origin: new google.maps.Point(0, 0),
                             // The anchor for this image is the base of the flagpole at (0, 32).
-                            anchor: new google.maps.Point(0, 32),
+                            anchor: new google.maps.Point(size/2, size/2),
                             scaledSize: new google.maps.Size(size, size)
                           };
                         city.mark = new google.maps.Marker({
@@ -142,6 +142,7 @@ function getData(){
                         city.circle= new google.maps.Circle({
                             center:{lat: city.lat, lng: city.lng},
                             radius:city.radius,
+                            fillOpacity:0,
                             strokeColor:'#0000ff',
                             map:map
                         });
@@ -175,7 +176,7 @@ function getData(){
                              // The origin for this image is (0, 0).
                              origin: new google.maps.Point(0, 0),
                              // The anchor for this image is the base of the flagpole at (0, 32).
-                             anchor: new google.maps.Point(0, 32),
+                             anchor: new google.maps.Point(size/2, size),
                              scaledSize: new google.maps.Size(size, size)
                            };
                          ambushe.mark = new google.maps.Marker({
@@ -187,7 +188,8 @@ function getData(){
 
                          ambushe.circle= new google.maps.Circle({
                              center:{lat: ambushe.lat, lng: ambushe.lng},
-                             radius:ambush.radius,
+                             radius:ambushe.radius,
+                             fillOpacity:0,
                              strokeColor:'#ff0000',
                              map:map
                          });
