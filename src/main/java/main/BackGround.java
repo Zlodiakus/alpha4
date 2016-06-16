@@ -31,6 +31,5 @@ public class BackGround {
         world.moveHour();
         world.close();
         MyUtils.Logwrite("BackGround.Hour","Finished");
-
     }
 }
