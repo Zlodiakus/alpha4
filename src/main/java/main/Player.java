@@ -418,7 +418,7 @@ public class Player {
                         Gold -= upcost;
                         UpdatePUpgrades(currentUpgrade.GUID, targetUpgrade.GUID);
                         update();
-                        if (targetUpgrade.Type.equals("cargo")) {bonusUpgradeRecount(targetUpgrade.Effect1/currentUpgrade.Effect1);}
+                        if (targetUpgrade.Type.equals("cargo")) {bonusUpgradeRecount((float)targetUpgrade.Effect1/currentUpgrade.Effect1);}
                         if (targetUpgrade.Type.equals("speed")) {profitUpgradeRecount(targetUpgrade.Effect1,targetUpgrade.Effect2);}
                         city.getGold(upcost/5);
                         //targetUpgrade.update(GUID, con);
