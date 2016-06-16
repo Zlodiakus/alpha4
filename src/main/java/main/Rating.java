@@ -15,6 +15,7 @@ public class Rating {
         String tempStr="",tempStr2="",ret="";
         tempStr2=Integer.toString(Int);
         tempStr = new StringBuffer(tempStr2).reverse().toString();
+        tempStr2="";
         while (tempStr.length()>3) {
             tempStr2=tempStr2.concat(tempStr.substring(0,3));
             tempStr2=tempStr2.concat(" ");
