@@ -701,6 +701,34 @@ public class Player {
         return ret;
     }
 
+    private String fastScan() {
+        PreparedStatement query;
+        ResultSet rs;
+        int radius = getPlayerUpgradeEffect1("paladin");
+        try {
+            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type from GameObjects z1 where ?<=round(6378137 * acos(cos(z1.Lat / 1e6 * PI() / 180) * cos(? / 1e6 * PI() / 180) * cos(z1.Lng / 1e6 * PI() / 180 - ? / 1e6 * PI() / 180) + sin(z1.Lat / 1e6 * PI() / 180) * sin(? / 1e6 * PI() / 180)))");
+            query.setInt(1,radius);
+            query.setInt(2,Lat);
+            query.setInt(3,Lng);
+            query.setInt(4,Lat);
+            rs = query.executeQuery();
+            while (rs.next()) {
+                JSONObject jobj = new JSONObject();
+                jobj.put("GUID", rs.getString("GUID"));
+                jobj.put("Lat", rs.getInt("Lat"));
+                jobj.put("Lng", rs.getInt("Lng"));
+                jobj.put("Type", rs.getString("Type"));
+                jarr.add(jobj);
+            }
+            jresult.put("FastScan",jarr);
+        } catch (SQLException e) {
+            jresult.put("Result", "DB001");
+            jresult.put("Message","Ошибка обращения к БД");
+            MyUtils.Logwrite("fastScan","Error: "+e.toString());
+        }
+        return jresult.toString();
+    }
+
     public String ScanRange() {
         Random random = new Random();
 
@@ -1398,6 +1426,9 @@ public class Player {
                 break;
             case "HirePeople":
                 result=hirePeople(TGUID, AMOUNT);
+                break;
+            case "FastScan":
+                result=fastScan();
                 break;
             default:
                 result = "{" + '"' + "Error" + '"' + ": " + '"' + "Unknown command." + '"' + "}";
