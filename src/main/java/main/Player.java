@@ -706,7 +706,7 @@ public class Player {
         ResultSet rs;
         int radius = getPlayerUpgradeEffect1("paladin");
         try {
-            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type from GameObjects z1 where ?>=round(6378137 * acos(cos(z1.Lat / 1e6 * PI() / 180) * cos(? / 1e6 * PI() / 180) * cos(z1.Lng / 1e6 * PI() / 180 - ? / 1e6 * PI() / 180) + sin(z1.Lat / 1e6 * PI() / 180) * sin(? / 1e6 * PI() / 180)))");
+            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type from GameObjects z1 where z1.Type not like 'City' and ?>=round(6378137 * acos(cos(z1.Lat / 1e6 * PI() / 180) * cos(? / 1e6 * PI() / 180) * cos(z1.Lng / 1e6 * PI() / 180 - ? / 1e6 * PI() / 180) + sin(z1.Lat / 1e6 * PI() / 180) * sin(? / 1e6 * PI() / 180)))");
             query.setInt(1,radius);
             query.setInt(2,Lat);
             query.setInt(3,Lng);
