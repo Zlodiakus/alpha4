@@ -852,7 +852,7 @@ public class Player {
                     Inf1 = rs.getLong("Influence1");
                     Inf2 = rs.getLong("Influence2");
                     Inf3 = rs.getLong("Influence3");
-                    CRadius=100+5*(CLevel - 1);
+                    CRadius=50+2*(CLevel - 1);
                     CreatorName=rs.getString("CreatorName");
                     CHirelings=rs.getInt("Hirelings");
                     jobj.put("GUID", TGUID);
@@ -1065,7 +1065,7 @@ public class Player {
                     jobj.put("Result", "OK");
                     if (res.equals(jobj.toString())) {
                         //bonus = 10 + getPlayerUpgradeEffect2("paladin");
-                        bonus = (20 + Math.min(720, ambush.TTS + 180) * ambush.Life) * getPlayerUpgradeEffect2("paladin") / 20;
+                        bonus = ((20 + Math.min(720, ambush.TTS + 180) * ambush.Life) * getPlayerUpgradeEffect2("paladin")) / 20;
                         if (ambush.PGUID.equals("Elf")) bonus+=1000;
                         jobj.put("Message", "Награда за уничтожение засады составила " + Integer.toString(bonus) + " золота!");
                         Hirelings -= 5 * ambush.Life; //апдейт в гетГолде пройдет
