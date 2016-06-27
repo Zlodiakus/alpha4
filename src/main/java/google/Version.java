@@ -13,7 +13,10 @@ public class Version {
                 "3.0.3a".equals(version)||
                 "3.0.4a".equals(version)||
                 "3.0.5a".equals(version)||
-                "3.0.6a".equals(version)
+                "3.0.6a".equals(version)||
+                "3.0.7a".equals(version)||
+                "3.0.8a".equals(version)||
+                "3.0.9a".equals(version)
                 ;
     }
     public static boolean checkHash(String hash,String version,String operation,String... params){
@@ -30,6 +33,12 @@ public class Version {
             case "3.0.5a":code="COWBOW";
                 break;
             case "3.0.6a":code="COWBOW";
+                break;
+            case "3.0.7a":code="COWBOW";
+                break;
+            case "3.0.8a":code="COWBOW";
+                break;
+            case "3.0.9a":code="COWBOW";
                 break;
             default: return false;
         }
