@@ -75,8 +75,8 @@ public class City {
         ResultSet rs;
         String CName, minName="в чистом поле";
         int TLat,TLng, TRadius, CLevel;
-        int minDist=250+mapper;
-        int minSelfDist=500+mapper;
+        int minDist=125+mapper;
+        int minSelfDist=250+mapper;
         boolean result=true;
         try {
             query = con.prepareStatement("select z2.Name,z1.Lat,z1.Lng,z2.Creator from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z1.Type='City' and z2.Creator=? and round(6378137 * acos(cos(z1.Lat / 1e6 * PI() / 180) * cos(? / 1e6 * PI() / 180) * cos(z1.Lng / 1e6 * PI() / 180 - ? / 1e6 * PI() / 180) + sin(z1.Lat / 1e6 * PI() / 180) * sin(? / 1e6 * PI() / 180)))<=?");
@@ -112,6 +112,7 @@ public class City {
     }
 
     public void spawn(String PGUID, int TLAT, int TLNG) {
+        MyUtils.Logwrite("City.spawn", "Start");
         PreparedStatement query;
         String CUpgradeType, CUName;
         int LAT, LNG, r;
@@ -180,6 +181,7 @@ public class City {
             //jresult.put("Error", "Can't set ambush here. City or another ambush is too close.");
             MyUtils.Logwrite("City.spawn", "Городу spawn не повезло, другой город был рядом. CGUID=(" + PGUID + ")");
         }
+        MyUtils.Logwrite("City.spawn", "Finish");
     }
 
 

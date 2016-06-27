@@ -214,20 +214,23 @@ public World() throws SQLException {
     }
 
     public void spawn() {
-        PreparedStatement query;
+        PreparedStatement query,query2;
         ResultSet rs;
         int i=0;
         MyUtils.Logwrite("World.spawn", "Start");
         try {
             query= con.prepareStatement("select z0.GUID, z1.Lat, z1.Lng from Cities z0, GameObjects z1 where z0.GUID=z1.GUID and z0.Level>1 and z0.tries<25");
             rs = query.executeQuery();
+            query2=con.prepareStatement("update Cities set tries=tries+1 where Level>1 and tries<25");
+            query2.execute();
+            query2.close();
+            con.commit();
             while (rs.next()) {
                 City city = new City(con);
                 city.spawn(rs.getString("GUID"),rs.getInt("Lat"),rs.getInt("Lng"));
             }
             rs.close();
             query.close();
-            con.commit();
         } catch (SQLException e) {
             MyUtils.Logwrite("World.spawn", "SQL Error: " + e.toString());
         }
