@@ -32,4 +32,12 @@ public class BackGround {
         world.close();
         MyUtils.Logwrite("BackGround.Hour","Finished");
     }
+    @Schedule(hour="*/4", minute="0", second="20", persistent=false)
+    public void WorldSpawn() throws SQLException, NamingException {
+        MyUtils.Logwrite("BackGround.Spawn","Started");
+        World world = new World();
+        world.spawn();
+        world.close();
+        MyUtils.Logwrite("BackGround.Spawn","Finished");
+    }
 }

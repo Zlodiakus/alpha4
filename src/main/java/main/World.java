@@ -213,6 +213,27 @@ public World() throws SQLException {
         MyUtils.Logwrite("World.handleFinishedCaravans", "Finish. "+Integer.toString(i)+" caravans finished.");
     }
 
+    public void spawn() {
+        PreparedStatement query;
+        ResultSet rs;
+        int i=0;
+        MyUtils.Logwrite("World.spawn", "Start");
+        try {
+            query= con.prepareStatement("select z0.GUID, z1.Lat, z1.Lng from Cities z0, GameObjects z1 where z0.GUID=z1.GUID and z0.Level>1 and z0.tries<25");
+            rs = query.executeQuery();
+            while (rs.next()) {
+                City city = new City(con);
+                city.spawn(rs.getString("GUID"),rs.getInt("Lat"),rs.getInt("Lng"));
+            }
+            rs.close();
+            query.close();
+            con.commit();
+        } catch (SQLException e) {
+            MyUtils.Logwrite("World.spawn", "SQL Error: " + e.toString());
+        }
+        MyUtils.Logwrite("World.spawn", "Finish. "+Integer.toString(i)+" caravans finished.");
+    }
+
     public static String Destroy() {
         return "Undestroyble";
         /*PreparedStatement query;
@@ -248,7 +269,7 @@ public World() throws SQLException {
     }
 
     public static String Create() {
-        PreparedStatement query;
+        /*PreparedStatement query;
         String Login,Password, ret="";
         //try {
             //Ростов
@@ -320,7 +341,7 @@ public World() throws SQLException {
             Generate.newGenCity(60049576, 30586955, 59973900, 30724026);
             //Воронеж
             Generate.newGenCity(51874603, 39011551, 51482454, 39461885);
-
+*/
 
         //Упс, для общего плана надо переделать генерилку, добавить параметр расстояния между городами. Сейчас он 375 метров
             //Общий план
