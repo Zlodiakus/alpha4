@@ -316,7 +316,7 @@ public class City {
                 jobj.put("Progress",0);
                 jobj.put("UpgradeType",CUpgradeType);
                 jobj.put("UpgradeName",CUName);
-                jobj.put("Radius",100);
+                jobj.put("Radius",50);
                 jobj.put("Influence1",0);
                 jobj.put("Influence2",0);
                 jobj.put("Influence3",0);
