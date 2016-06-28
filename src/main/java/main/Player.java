@@ -858,7 +858,7 @@ public class Player {
             }
 
             //Города
-            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.Hirelings, z2.Creator, (select Name from Players p where z2.Creator=p.GUID) as CreatorName,z2.Name,z2.Level,z2.Exp currentExp,z3.Exp nextLevelExp,z4.Exp thisLevelExp, z2.UpgradeType, (select z3.Name from Upgrades z3 where z2.UpgradeType=z3.Type and z3.Level=0 LIMIT 1) UName, z2.Influence1, z2.Influence2, z2.Influence3 from GameObjects z1 USE INDEX (`LatLng`), Cities z2, Levels z3, Levels z4 where z2.GUID=z1.GUID and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+? and z3.Type='city' and z3.Level=z2.Level+1 and z4.level=z2.level and z4.Type='City'");
+            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.Hirelings, z2.Creator, (select Name from Players p where z2.Creator=p.GUID) as CreatorName, (select Name from Cities c where z2.Creator=c.GUID) as CityCreatorName, z2.Name,z2.Level,z2.Exp currentExp,z3.Exp nextLevelExp,z4.Exp thisLevelExp, z2.UpgradeType, (select z3.Name from Upgrades z3 where z2.UpgradeType=z3.Type and z3.Level=0 LIMIT 1) UName, z2.Influence1, z2.Influence2, z2.Influence3 from GameObjects z1 USE INDEX (`LatLng`), Cities z2, Levels z3, Levels z4 where z2.GUID=z1.GUID and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+? and z3.Type='city' and z3.Level=z2.Level+1 and z4.level=z2.level and z4.Type='City'");
             query.setInt(1, Lat);
             query.setInt(2, deltaLatCities);
             query.setInt(3, deltaLatCities);
@@ -885,7 +885,7 @@ public class Player {
                     Inf2 = rs.getLong("Influence2");
                     Inf3 = rs.getLong("Influence3");
                     CRadius=50+2*(CLevel - 1);
-                    CreatorName=rs.getString("CreatorName");
+                    CreatorName=(rs.getString("CreatorName") == null)?rs.getString("CityCreatorName"):rs.getString("CreatorName");
                     CHirelings=rs.getInt("Hirelings");
                     jobj.put("GUID", TGUID);
                     jobj.put("Type", Type);
