@@ -853,7 +853,6 @@ public class Player {
                         jobj.put("Life",TLife*10);
                         jarr.add(jobj);
                     }
-
                 }
             }
 
