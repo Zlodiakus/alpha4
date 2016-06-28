@@ -8,37 +8,31 @@ import utility.StringUtils;
  */
 public class Version {
     public static boolean checkVersion(String version){
-        return  "3.0.1a".equals(version)||
-                "3.0.2a".equals(version)||
-                "3.0.3a".equals(version)||
-                "3.0.4a".equals(version)||
-                "3.0.5a".equals(version)||
-                "3.0.6a".equals(version)||
-                "3.0.7a".equals(version)||
+        return  "3.0.7a".equals(version)||
                 "3.0.8a".equals(version)||
-                "3.0.9a".equals(version)
+                "3.0.9a".equals(version)||
+                "3.0.10a".equals(version)||
+                "3.0.11a".equals(version)||
+                "3.0.12a".equals(version)||
+                "3.0.13a".equals(version)
                 ;
     }
     public static boolean checkHash(String hash,String version,String operation,String... params){
         String code;
         switch (version){
-            case "3.0.1a":code="COWBOW";
-                break;
-            case "3.0.2a":code="COWBOW";
-                break;
-            case "3.0.3a":code="COWBOW";
-                break;
-            case "3.0.4a":code="COWBOW";
-                break;
-            case "3.0.5a":code="COWBOW";
-                break;
-            case "3.0.6a":code="COWBOW";
-                break;
             case "3.0.7a":code="COWBOW";
                 break;
             case "3.0.8a":code="COWBOW";
                 break;
             case "3.0.9a":code="COWBOW";
+                break;
+            case "3.0.10a":code="COWBOW";
+                break;
+            case "3.0.11a":code="COWBOW";
+                break;
+            case "3.0.12a":code="COWBOW";
+                break;
+            case "3.0.13a":code="COWBOW";
                 break;
             default: return false;
         }
