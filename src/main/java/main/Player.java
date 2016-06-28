@@ -760,16 +760,28 @@ public class Player {
                     Start = rs.getString("Start");
                     Finish = rs.getString("Finish");
                     Speed = rs.getInt("Speed");
-                    if (TPGUID.equals(GUID)) COwner=0;
-                    else COwner=rs.getInt("Race");
-                    //1-апрельские шутки
-                    //COwner+=1;if (COwner==4) COwner=1;}
-                    //else COwner=random.nextInt(3)+1;
-                    jobj.put("GUID", TGUID);
-                    jobj.put("Type", Type);
-                    jobj.put("Lat", TLat);
-                    jobj.put("Lng", TLng);
-                    jobj.put("Owner", COwner);
+                    if (TPGUID.equals(GUID))
+                    {
+                        COwner=0;
+                        jobj.put("GUID", TGUID);
+                        jobj.put("Type", Type);
+                        jobj.put("Lat", TLat);
+                        jobj.put("Lng", TLng);
+                        jobj.put("Owner", COwner);
+                    }
+                    else {
+                        COwner = rs.getInt("Race");
+                        //1-апрельские шутки
+                        //COwner+=1;if (COwner==4) COwner=1;}
+                        //else COwner=random.nextInt(3)+1;
+                        jobj.put("GUID", TGUID);
+                        jobj.put("Type", Type);
+                        if (!Name.equals("Shadilan")) {
+                            jobj.put("Lat", TLat);
+                            jobj.put("Lng", TLng);
+                        }
+                        jobj.put("Owner", COwner);
+                    }
 
                     query2 = con.prepareStatement("select z2.Name StartName,z1.Lat StartLat,z1.Lng StartLng,z4.Name FinishName,z3.Lat FinishLat,z3.Lng FinishLng from GameObjects z1, Cities z2, GameObjects z3, Cities z4 where z2.GUID=z1.GUID and z4.GUID=z3.GUID and z1.GUID=? and z3.GUID=?");
                     query2.setString(1, Start);
@@ -810,18 +822,38 @@ public class Player {
                     TTTS = rs.getInt("TTS");
                     TName = rs.getString("Name");
                     TLife=rs.getInt("Life");
-                    if (TPGUID.equals(GUID)) AOwner=0;
-                    else AOwner=rs.getInt("Race");
-                    jobj.put("GUID", TGUID);
-                    jobj.put("Type", Type);
-                    jobj.put("Lat", TLat);
-                    jobj.put("Lng", TLng);
-                    jobj.put("Owner", AOwner);
-                    jobj.put("Radius", TRadius);
-                    jobj.put("Ready", TTTS);
-                    jobj.put("Name",TName);
-                    jobj.put("Life",TLife*10);
-                    jarr.add(jobj);
+                    if (TPGUID.equals(GUID))
+                    {
+                        AOwner=0;
+                        jobj.put("GUID", TGUID);
+                        jobj.put("Type", Type);
+                        jobj.put("Lat", TLat);
+                        jobj.put("Lng", TLng);
+                        jobj.put("Owner", AOwner);
+                        jobj.put("Radius", TRadius);
+                        jobj.put("Ready", TTTS);
+                        jobj.put("Name",TName);
+                        jobj.put("Life",TLife*10);
+                        jarr.add(jobj);
+                    }
+
+                    else
+                    {
+                        AOwner=rs.getInt("Race");
+                        jobj.put("GUID", TGUID);
+                        jobj.put("Type", Type);
+                        if (!Name.equals("Shadilan")) {
+                            jobj.put("Lat", TLat);
+                            jobj.put("Lng", TLng);
+                        }
+                        jobj.put("Owner", AOwner);
+                        jobj.put("Radius", TRadius);
+                        jobj.put("Ready", TTTS);
+                        jobj.put("Name",TName);
+                        jobj.put("Life",TLife*10);
+                        jarr.add(jobj);
+                    }
+
                 }
             }
 
