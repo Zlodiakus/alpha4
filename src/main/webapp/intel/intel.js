@@ -136,7 +136,7 @@ function getData(){
                             map: map
                         });
 
-                        city.radius=100+5*(city.level - 1);
+                        city.radius=50+2*(city.level - 1);
                         city.circle= new google.maps.Circle({
                             center:{lat: city.lat, lng: city.lng},
                             radius:city.radius,

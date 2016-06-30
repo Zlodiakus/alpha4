@@ -267,7 +267,16 @@ public class intel {
                         ambushes.add(obj);
                     }
                     robj.put("Ambushes",ambushes);
-                    pstmt=con.prepareStatement("SELECT c.GUID, ob.Lat, ob.Lng, c.Name, c.Level, p.Name founder, u.Name, \n" +
+                    pstmt=con.prepareStatement("SELECT c.GUID, ob.Lat, ob.Lng, c.Name, c.Level, (\n" +
+                            "\n" +
+                            "SELECT Name\n" +
+                            "FROM Players p\n" +
+                            "WHERE p.guid = c.creator\n" +
+                            "UNION \n" +
+                            "SELECT Name\n" +
+                            "FROM Cities c2\n" +
+                            "WHERE c2.guid = c.creator\n" +
+                            ")founder, u.Name, \n" +
                             "CASE WHEN Influence1 > Influence2\n" +
                             "AND Influence1 > Influence3\n" +
                             "THEN  '1'\n" +
@@ -279,12 +288,11 @@ public class intel {
                             "THEN  '3'\n" +
                             "ELSE  '0'\n" +
                             "END faction, Influence1, Influence2, Influence3\n" +
-                            "FROM GameObjects ob, Cities c, Players p, Upgrades u\n" +
-                            "WHERE c.GUID = ob.GUID\n" +
-                            "AND ob.Type =  'City'\n" +
-                            "AND p.guid = c.creator\n" +
-                            "AND c.UpgradeType = u.Type\n" +
-                            "AND u.level =0\n" +
+                            "FROM GameObjects ob\n" +
+                            "JOIN Cities c ON c.GUID = ob.GUID\n" +
+                            "JOIN Upgrades u ON ( c.UpgradeType = u.Type\n" +
+                            "AND u.level =0 ) \n" +
+                            "WHERE ob.Type =  'City'\n" +
                             "AND ob.Lat\n" +
                             "BETWEEN ? \n" +
                             "AND ? \n" +
