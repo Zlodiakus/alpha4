@@ -776,7 +776,7 @@ public class Player {
                         //else COwner=random.nextInt(3)+1;
                         jobj.put("GUID", TGUID);
                         jobj.put("Type", Type);
-                        if (!Name.equals("Shadilan")) {
+                        if (!Name.equals("Shadilan")&&!Name.equals("Zlodiak")) {
                             jobj.put("Lat", TLat);
                             jobj.put("Lng", TLng);
                         }
@@ -842,7 +842,7 @@ public class Player {
                         AOwner=rs.getInt("Race");
                         jobj.put("GUID", TGUID);
                         jobj.put("Type", Type);
-                        if (!Name.equals("Shadilan")) {
+                        if (!Name.equals("Shadilan")&&!Name.equals("Zlodiak")) {
                             jobj.put("Lat", TLat);
                             jobj.put("Lng", TLng);
                         }

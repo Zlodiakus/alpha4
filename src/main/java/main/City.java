@@ -179,7 +179,7 @@ public class City {
             }
         } else {
             //jresult.put("Error", "Can't set ambush here. City or another ambush is too close.");
-            MyUtils.Logwrite("City.spawn", "Городу spawn не повезло, другой город был рядом. CGUID=(" + PGUID + ")");
+            MyUtils.Logwrite("City.spawn", "Городу spawn ("+randLat+"|"+randLng+") в метрах, ("+delta_lat_rand+"|"+delta_lng_rand+") не повезло, другой город был рядом. CGUID=(" + PGUID + ")");
         }
         MyUtils.Logwrite("City.spawn", "Finish");
     }
