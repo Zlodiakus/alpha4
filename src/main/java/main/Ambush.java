@@ -260,7 +260,7 @@ public class Ambush {
             MyUtils.Logwrite("Ambush.caravaned", "В городе "+city.Name+"("+ CGUID+") разбойники пропили " + bonus + " золота.");
         }
         player.addStat("ambushed",bonus);
-        MyUtils.Message(PGUID,"Чей-то караван попался в вашу засаду "+Name+"! Добыча составила "+Integer.toString(bonus)+" монет!",3,0,Lat,Lng);
+        if (!PGUID.equals("Elf")) MyUtils.Message(PGUID,"Чей-то караван попался в вашу засаду "+Name+"! Добыча составила "+Integer.toString(bonus)+" монет!",3,0,Lat,Lng);
         Life-=1;
         if (Life<=0) {
             delete(con);
