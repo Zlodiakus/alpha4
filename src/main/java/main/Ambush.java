@@ -253,12 +253,14 @@ public class Ambush {
         //PreparedStatement query;
         Player player=new Player(PGUID,con);
         player.getGold(bonus);
-        CGUID=player.getRandomCity();
+        player.drinkAway(bonus);
+        /*CGUID=player.getRandomCity();
         if (CGUID.length()>0) {
             City city = new City(CGUID,con);
             city.getGold(bonus,player.Race);
             MyUtils.Logwrite("Ambush.caravaned", "В городе "+city.Name+"("+ CGUID+") разбойники пропили " + bonus + " золота.");
         }
+        */
         player.addStat("ambushed",bonus);
         if (!PGUID.equals("Elf")) MyUtils.Message(PGUID,"Чей-то караван попался в вашу засаду "+Name+"! Добыча составила "+Integer.toString(bonus)+" монет!",3,0,Lat,Lng);
         Life-=1;

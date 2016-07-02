@@ -729,6 +729,34 @@ public class Player {
         return jresult.toString();
     }
 
+    public void drinkAway(int drinkBonus) {
+        MyUtils.Logwrite("drinkAway","Start");
+        PreparedStatement query,query2;
+        ResultSet rs,rs2;
+        int totalLevel,citiesCount;
+        try {
+            query2=con.prepareStatement("select count(1), sum(Level) from Cities where Creator like ?");
+            query2.setString(1,GUID);
+            rs2=query2.executeQuery();
+            rs2.first();
+            citiesCount=rs2.getInt(1);
+            totalLevel=rs2.getInt(2);
+
+            query = con.prepareStatement("select GUID, Level, Name from Cities where Creator like ?");
+            query.setString(1,GUID);
+            rs = query.executeQuery();
+            while (rs.next()) {
+                City city=new City(rs.getString("GUID"),con);
+                int bonus=(int)(0.2*drinkBonus*rs.getInt("Level")*citiesCount/totalLevel);
+                MyUtils.Logwrite("drinkAway","Пропиваем "+bonus+" золота в "+rs.getString("Name"));
+                city.getGold(bonus,Race);
+            }
+        } catch (SQLException e) {
+            MyUtils.Logwrite("drinkAway","Error: "+e.toString());
+        }
+        MyUtils.Logwrite("drinkAway","Finish");
+    }
+
     public String ScanRange() {
         Random random = new Random();
 
