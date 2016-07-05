@@ -804,10 +804,10 @@ public class Player {
                         //else COwner=random.nextInt(3)+1;
                         jobj.put("GUID", TGUID);
                         jobj.put("Type", Type);
-                        if (!Name.equals("Shadilan")&&!Name.equals("Zlodiak")) {
-                            jobj.put("Lat", TLat);
-                            jobj.put("Lng", TLng);
-                        }
+                        //if (!Name.equals("Shadilan")&&!Name.equals("Zlodiak")) {
+                        //    jobj.put("Lat", TLat);
+                        //    jobj.put("Lng", TLng);
+                        //}
                         jobj.put("Owner", COwner);
                     }
 
@@ -870,10 +870,10 @@ public class Player {
                         AOwner=rs.getInt("Race");
                         jobj.put("GUID", TGUID);
                         jobj.put("Type", Type);
-                        if (!Name.equals("Shadilan")&&!Name.equals("Zlodiak")) {
-                            jobj.put("Lat", TLat);
-                            jobj.put("Lng", TLng);
-                        }
+                        //if (!Name.equals("Shadilan")&&!Name.equals("Zlodiak")) {
+                        //    jobj.put("Lat", TLat);
+                        //    jobj.put("Lng", TLng);
+                        //}
                         jobj.put("Owner", AOwner);
                         jobj.put("Radius", TRadius);
                         jobj.put("Ready", TTTS);
