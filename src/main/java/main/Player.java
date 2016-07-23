@@ -1273,6 +1273,81 @@ public class Player {
         return res;
     }
 
+    public String FinishStartRoute(String TGUID) {
+        boolean flag=false;
+        MyUtils.Logwrite("FinishStartRoute","Started by "+Name, r.freeMemory());
+        String res,SGUID;
+        String checkUnfinishedRoute,RGUID;
+        if (checkRangeToObj(TGUID)) {
+            checkUnfinishedRoute=getUnfinishedRoute();
+            if (checkUnfinishedRoute.equals("No route")) {
+                jresult.put("Result","O0603");
+                jresult.put("Message", "Завершение маршрута не удалось, т.к. маршрут не был стартован");
+                res=jresult.toString();
+                flag=true;
+            }
+            else {
+                if (checkUnfinishedRoute.equals("Error")) {
+                    jresult.put("Result","BD001");
+                    jresult.put("Message", "Ошибка обращения к БД");
+                    res=jresult.toString();
+                    flag=false;
+                }
+                else {
+                    RGUID=checkUnfinishedRoute;
+                    if (!doubleRoute(TGUID,RGUID)) {
+                        int accel = getPlayerUpgradeEffect1("speed");
+                        int speed = getPlayerUpgradeEffect2("speed");
+                        int cargo = getPlayerUpgradeEffect1("cargo");
+                        City cityF = new City (TGUID, con);
+                        try {
+                            PreparedStatement query = con.prepareStatement("select Start from Caravans where Finish is null and PGUID=?");
+                            query.setString(1, GUID);
+                            ResultSet rs0 = query.executeQuery();
+                            rs0.first();
+                            SGUID = rs0.getString("Start");
+                        }
+                        catch (SQLException e) {
+                            jresult.put("Result", "BD001");
+                            jresult.put("Message", "Ошибка обращения к БД");
+                            res = jresult.toString();
+                            return res;
+                        }
+                        City cityS=new City(SGUID,con);
+
+                        if (Hirelings<cityS.Level+cityF.Level) {jresult.put("Result","O0606");jresult.put("Message","Недостаточно людей для запуска каравана. Нужно "+(cityS.Level+cityF.Level));res=jresult.toString();flag=false;}
+                        else {
+                            Caravan caravan = new Caravan(con);
+                            res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
+                            if (res.contains("OK")) {Hirelings-=cityS.Level+cityF.Level;update();
+                            flag=true;}
+                        }
+                    }
+                    else {
+                        jresult.put("Result","O0604");
+                        jresult.put("Message","Такой маршрут уже существует, вы не можете создать два одинаковых маршрута!");
+                        res=jresult.toString();
+                        flag=false;
+                    }
+                }
+            }
+        }
+        else {
+            jresult.put("Result","O0602");
+            jresult.put("Message", "Город слишком далеко.");
+            res=jresult.toString();
+            flag=false;
+        }
+        if (flag) {
+            Caravan caravan = new Caravan(con);
+            String res2 = caravan.StartRoute(GUID, TGUID, con);
+            return res+res2;
+        }
+
+        MyUtils.Logwrite("FinishStartRoute","Finished by "+Name, r.freeMemory());
+        return res;
+    }
+
     private boolean doubleRoute(String TGUID, String RGUID) {
         PreparedStatement query;
         String SGUID;
@@ -1488,6 +1563,9 @@ public class Player {
                 break;
             case "FastScan":
                 result=fastScan();
+                break;
+            case "FinishStartRoute":
+                result=FinishStartRoute(TGUID);
                 break;
             default:
                 result = "{" + '"' + "Error" + '"' + ": " + '"' + "Unknown command." + '"' + "}";
