@@ -3,6 +3,7 @@ package main;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import javax.json.stream.JsonParser;
 import javax.naming.NamingException;
 //import javax.resource.cci.ResultSet;
 import java.sql.Connection;
@@ -498,7 +499,7 @@ public class Player {
         String UpType,UpName,UpDesc,CarGUID,StartGUID,StartName,FinishGUID,FinishName,AmbGUID,AmbName;
         ResultSet rs;
         JSONArray jarr2 = new JSONArray();
-        if (GUID.equals("")) {jresult.put("Error","No player found."); return jresult.toString();}
+        if (GUID.equals("")) {jresult.put("Result","DB001");jresult.put("Message","Player not found."); return jresult.toString();}
 
         jresult.put("GUID",GUID);
         jresult.put("PlayerName",Name);
@@ -508,7 +509,7 @@ public class Player {
         jresult.put("Race",Race);
         jresult.put("Hirelings",Hirelings);
         //int LeftToHire=getPlayerUpgradeEffect1("leadership") - Hirelings - HirelingsInAmbushes;
-        int LeftToHire=Level*100 - Hirelings - HirelingsInAmbushes;
+        int LeftToHire=Level*(100+5*Level) - Hirelings - HirelingsInAmbushes;
         jresult.put("LeftToHire",LeftToHire);
         //jresult.put("HirelingsInAmbushes",HirelingsInAmbushes);
         PreparedStatement query;
@@ -1274,6 +1275,8 @@ public class Player {
     }
 
     public String FinishStartRoute(String TGUID) {
+        JSONArray jarr = new JSONArray();
+        JsonParser jsonParser;
         boolean flag=false;
         MyUtils.Logwrite("FinishStartRoute","Started by "+Name, r.freeMemory());
         String res,SGUID;
@@ -1320,6 +1323,7 @@ public class Player {
                             Caravan caravan = new Caravan(con);
                             res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
                             if (res.contains("OK")) {Hirelings-=cityS.Level+cityF.Level;update();
+
                             flag=true;}
                         }
                     }
@@ -1590,7 +1594,7 @@ public class Player {
                 jresult.put("Message", "В городе нет столько наемников!");
                 MyUtils.Logwrite("hirePeople",Name+" В городе нет столько наемников!", r.freeMemory());
             } else {
-                if (Hirelings + HirelingsInAmbushes + AMOUNT > Level*100) {
+                if (Hirelings + HirelingsInAmbushes + AMOUNT > Level*(100+5*Level)) {
                     jresult.put("Result", "O1304");
                     jresult.put("Message", "Вы пока не можете управлять таким количеством наемников!");
                     MyUtils.Logwrite("hirePeople",Name+" Вы пока не можете управлять таким количеством наемников!", r.freeMemory());
