@@ -316,11 +316,11 @@ public class Player {
             query.execute();
             con.commit();
             query.close();
-            jresult.put("Result","OK");
+            //jresult.put("Result","OK");
         } catch (SQLException e) {
             MyUtils.Logwrite("Player.update","Failed player "+Name+" update. SQL Error: "+e.toString());
-            jresult.put("Result","DB001");
-            jresult.put("Message","Ошибка обновления данных игрока: "+e.toString());
+            //jresult.put("Result","DB001");
+            //jresult.put("Message","Ошибка обновления данных игрока: "+e.toString());
         }
     }
 
@@ -1324,8 +1324,8 @@ public class Player {
 
                         if (Hirelings<cityS.Level+cityF.Level) {jresult.put("Result","O0606");jresult.put("Message","Недостаточно людей для запуска каравана. Нужно "+(cityS.Level+cityF.Level));res=jresult.toString();flag=false;}
                         else {
-                            Caravan caravan = new Caravan(con);
-                            res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
+                            //Caravan caravan = new Caravan(con);
+                            //res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
                             String CGUID=TGUID;
                             //-----------------------------------------------------------------------
                             //public String FinishRoute(String RGUID, String CGUID, int speed, int accel, int cargo, Connection con) {
@@ -1426,7 +1426,7 @@ public class Player {
             flag=false;
         }
         if (flag) {
-            Caravan caravan = new Caravan(con);
+            //Caravan caravan = new Caravan(con);
             //String res2 = caravan.StartRoute(GUID, TGUID, con);
             //--------------------------------------------------------------------
             //public String StartRoute(String PGUID, String CGUID, Connection con) {
