@@ -298,7 +298,8 @@ public class Player {
     }
 
     private boolean checkForLevel() {
-        return (Exp>=getTNL());
+        if (Level<20) return (Exp>=getTNL());
+        else return false;
     }
 
 
@@ -1275,19 +1276,22 @@ public class Player {
     }
 
     public String FinishStartRoute(String TGUID) {
-        JSONArray jarr = new JSONArray();
-        JsonParser jsonParser;
+        JSONArray FRjarr = new JSONArray();
         boolean flag=false;
+        String restmp="";
+        String mestmp="";
         MyUtils.Logwrite("FinishStartRoute","Started by "+Name, r.freeMemory());
         String res,SGUID;
         String checkUnfinishedRoute,RGUID;
         if (checkRangeToObj(TGUID)) {
             checkUnfinishedRoute=getUnfinishedRoute();
             if (checkUnfinishedRoute.equals("No route")) {
-                jresult.put("Result","O0603");
-                jresult.put("Message", "Завершение маршрута не удалось, т.к. маршрут не был стартован");
+                //jresult.put("Result","O0603");
+                //jresult.put("Message", "Завершение маршрута не удалось, т.к. маршрут не был стартован");
                 res=jresult.toString();
                 flag=true;
+                restmp="3";
+                mestmp="Завершение маршрута не удалось, т.к. маршрут не был стартован.";
             }
             else {
                 if (checkUnfinishedRoute.equals("Error")) {
@@ -1383,7 +1387,7 @@ public class Player {
                                     con.commit();
 //            rs.close();
                                     FRquery.close();
-                                    jresult.put("Result","OK");
+                                    restmp ="0";
                                     FRjobj.put("GUID", RGUID);
                                     FRjobj.put("Lat",FRLat);
                                     FRjobj.put("Lng",FRLng);
@@ -1397,14 +1401,13 @@ public class Player {
                                     FRjobj.put("StartLng",FRLngS);
                                     FRjobj.put("FinishLat",FRLat);
                                     FRjobj.put("FinishLng",FRLng);
-                                    jresult.put("Route",FRjobj);
+                                    FRjarr.add(FRjobj);
+                                    Hirelings-=cityS.Level+cityF.Level;update();flag=true;
+
                                 } catch (SQLException e) {MyUtils.Logwrite("Caravan.FinishRoute",e.toString());jresult.put("Result","BD001");jresult.put("Message","Ошибка обращения к БД"); /*return jresult.toString();*/}
                             //    return jresult.toString();
                             //}
                             //-----------------------------------------------------------------------
-                            if (res.contains("OK")) {Hirelings-=cityS.Level+cityF.Level;update();
-
-                            flag=true;}
                         }
                     }
                     else {
@@ -1424,12 +1427,49 @@ public class Player {
         }
         if (flag) {
             Caravan caravan = new Caravan(con);
-            String res2 = caravan.StartRoute(GUID, TGUID, con);
-            return res+res2;
+            //String res2 = caravan.StartRoute(GUID, TGUID, con);
+            //--------------------------------------------------------------------
+            //public String StartRoute(String PGUID, String CGUID, Connection con) {
+            String PGUID=GUID;
+            String CGUID=TGUID;
+            String SRGUID= UUID.randomUUID().toString();
+                JSONObject jobj = new JSONObject();
+                PreparedStatement SRquery;
+                City city = new City(CGUID,con);
+                try{
+                    SRquery=con.prepareStatement("insert into Caravans (GUID,PGUID,Start,Speed) values (?,?,?,?) ");
+                    SRquery.setString(1,SRGUID);
+                    SRquery.setString(2,PGUID);
+                    SRquery.setString(3,CGUID);
+                    SRquery.setInt(4, 0);
+                    SRquery.execute();
+                    con.commit();
+                    SRquery=con.prepareStatement("select Lat,Lng from GameObjects where GUID=?");
+                    SRquery.setString(1,CGUID);
+                    ResultSet SRrs=SRquery.executeQuery();
+                    SRrs.first();
+                    int SRLat=SRrs.getInt(1);
+                    int SRLng=SRrs.getInt(2);
+                    SRquery.close();
+                    if (restmp.equals("0")) {jresult.put("Result","OK");}
+                    else {jresult.put("Result","O060"+restmp); jresult.put("Message",mestmp);}
+                    jobj.put("GUID",SRGUID);
+                    jobj.put("StartLat",SRLat);
+                    jobj.put("StartLng",SRLng);
+                    jobj.put("StartGUID",CGUID);
+                    jobj.put("StartName",city.Name);
+                    FRjarr.add(jobj);
+                } catch (SQLException e) {jresult.put("Result","DB01"+restmp);jresult.put("Message",mestmp+"Ошибка обращения к БД при создании маршрута.");/*return jresult.toString();*/}
+                //jresult.put("Route",jobj);
+            jresult.put("Routes",FRjarr);
+            //    return jresult.toString();
+            //}
+
+            //--------------------------------------------------------------------
         }
 
         MyUtils.Logwrite("FinishStartRoute","Finished by "+Name, r.freeMemory());
-        return res;
+        return jresult.toString();
     }
 
     private boolean doubleRoute(String TGUID, String RGUID) {
