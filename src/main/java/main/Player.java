@@ -1322,6 +1322,86 @@ public class Player {
                         else {
                             Caravan caravan = new Caravan(con);
                             res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
+                            String CGUID=TGUID;
+                            //-----------------------------------------------------------------------
+                            //public String FinishRoute(String RGUID, String CGUID, int speed, int accel, int cargo, Connection con) {
+                                JSONObject FRjobj = new JSONObject();
+                                PreparedStatement FRquery;
+                                int FRlevelS,FRlevelF;
+                                double t,t1,t2,s1;
+                                try{
+                                    FRquery=con.prepareStatement("select Lat,Lng from GameObjects where GUID=?");
+                                    FRquery.setString(1,CGUID);
+                                    ResultSet FRrs=FRquery.executeQuery();
+                                    FRrs.first();
+                                    int FRLat=FRrs.getInt(1);
+                                    int FRLng=FRrs.getInt(2);
+                                    //rs.close();
+                                    FRquery=con.prepareStatement("select z1.Lat,z1.Lng,z2.Start from GameObjects z1, Caravans z2 where z2.GUID=? and z2.Start=z1.GUID");
+                                    FRquery.setString(1,RGUID);
+                                    FRrs=FRquery.executeQuery();
+                                    FRrs.first();
+                                    int FRLatS=FRrs.getInt("Lat");
+                                    int FRLngS=FRrs.getInt("Lng");
+                                    String FRStart=FRrs.getString("Start");
+
+                                    if ((FRLatS==FRLat) && (FRLngS==FRLng)) {jresult.put("Result","O0605");jresult.put("Message","Ваш маршрут начинается в этом городе, вы не можете завершить маршрут в нем!");return jresult.toString();}
+                                    FRquery=con.prepareStatement("insert into GameObjects (GUID,Lat,Lng,Type) values (?,?,?,'Caravan')");
+                                    FRquery.setString(1,RGUID);
+                                    FRquery.setInt(2,FRLatS);
+                                    FRquery.setInt(3,FRLngS);
+                                    FRquery.execute();
+
+                                    FRquery=con.prepareStatement("select Level, Name from Cities where GUID=?");
+                                    FRquery.setString(1,FRStart);
+                                    FRrs=FRquery.executeQuery();
+                                    FRrs.first();
+                                    FRlevelS=FRrs.getInt("Level");
+                                    String FRStartName=FRrs.getString("Name");
+
+                                    FRquery=con.prepareStatement("select Level, Name from Cities where GUID=?");
+                                    FRquery.setString(1,CGUID);
+                                    FRrs=FRquery.executeQuery();
+                                    FRrs.first();
+                                    FRlevelF=FRrs.getInt("Level");
+                                    String FRFinishName=FRrs.getString("Name");
+
+                                    int FRDistance=(int)MyUtils.distVincenty(FRLatS,FRLngS,FRLat,FRLng);
+                                    int FRbonus=(int)((Math.sqrt(FRlevelS*FRlevelF)*FRDistance*cargo)/1000);
+                                    t1=(double)(speed-1-accel)/accel;
+                                    s1=(double)((1+accel)*t1+accel*t1*t1/2);
+                                    t2=(double)(FRDistance-s1)/speed;
+                                    t=t1+t2;
+                                    int FRprofit=(int)(60*FRbonus/t);
+                                    FRquery=con.prepareStatement("update Caravans set Finish=?,Speed=1,Distance=?, bonus=?,profit=? where GUID=?");
+                                    FRquery.setString(1,CGUID);
+                                    FRquery.setInt(2,FRDistance);
+                                    FRquery.setInt(3,FRbonus);
+                                    FRquery.setInt(4,FRprofit);
+                                    FRquery.setString(5,RGUID);
+                                    FRquery.execute();
+                                    con.commit();
+//            rs.close();
+                                    FRquery.close();
+                                    jresult.put("Result","OK");
+                                    FRjobj.put("GUID", RGUID);
+                                    FRjobj.put("Lat",FRLat);
+                                    FRjobj.put("Lng",FRLng);
+                                    FRjobj.put("StartGUID", FRStart);
+                                    FRjobj.put("StartName", FRStartName);
+                                    FRjobj.put("FinishGUID", CGUID);
+                                    FRjobj.put("FinishName", FRFinishName);
+                                    FRjobj.put("Distance", FRDistance);
+                                    FRjobj.put("profit", FRprofit);
+                                    FRjobj.put("StartLat",FRLatS);
+                                    FRjobj.put("StartLng",FRLngS);
+                                    FRjobj.put("FinishLat",FRLat);
+                                    FRjobj.put("FinishLng",FRLng);
+                                    jresult.put("Route",FRjobj);
+                                } catch (SQLException e) {MyUtils.Logwrite("Caravan.FinishRoute",e.toString());jresult.put("Result","BD001");jresult.put("Message","Ошибка обращения к БД"); /*return jresult.toString();*/}
+                            //    return jresult.toString();
+                            //}
+                            //-----------------------------------------------------------------------
                             if (res.contains("OK")) {Hirelings-=cityS.Level+cityF.Level;update();
 
                             flag=true;}
