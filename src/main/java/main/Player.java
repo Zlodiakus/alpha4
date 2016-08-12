@@ -627,7 +627,7 @@ public class Player {
             jresult.put("Routes",jarr2);
 
             jarr2 = new JSONArray();
-            query=con.prepareStatement("select z1.GUID,z1.Lat,z1.Lng,z2.Name from GameObjects z1, Ambushes z2 where z2.GUID=z1.GUID and z2.PGUID=?");
+            query=con.prepareStatement("select z1.GUID,z1.Lat,z1.Lng,z2.Name,z2.Radius,z2.TTS,z2.Life from GameObjects z1, Ambushes z2 where z2.GUID=z1.GUID and z2.PGUID=?");
             query.setString(1, GUID);
             rs = query.executeQuery();
             while (rs.next()) {
@@ -636,10 +636,15 @@ public class Player {
                 AmbLat=rs.getInt("Lat");
                 AmbLng=rs.getInt("Lng");
                 AmbName="Засада "+rs.getString("Name");
+                jobj.put("Type","Ambush");
                 jobj.put("GUID", AmbGUID);
-                jobj.put("Name", AmbName);
                 jobj.put("Lat", AmbLat);
                 jobj.put("Lng", AmbLng);
+                jobj.put("Owner",0);
+                jobj.put("Radius",rs.getInt("Radius"));
+                jobj.put("Ready",rs.getInt("TTS"));
+                jobj.put("Life",rs.getInt("Life")*10);
+                jobj.put("Name", AmbName);
                 jarr2.add(jobj);
             }
             rs.close();
@@ -1098,7 +1103,7 @@ public class Player {
                 res=jresult.toString();
             }
         } else {
-            jresult.put("Result", "O0202"); jresult.put("Error", "Засада слишком далеко!");
+            jresult.put("Result", "O0202"); jresult.put("Message", "Засада слишком далеко!");
             res=jresult.toString();
         }
         MyUtils.Logwrite("SetAmbush","Finished by "+Name, r.freeMemory());
