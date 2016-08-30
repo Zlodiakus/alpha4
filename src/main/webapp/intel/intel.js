@@ -28,7 +28,9 @@ function initialize(){
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
     map =new  google.maps.Map(document.getElementById("map-canvas"),mapOptions);
-    map.addListener('bounds_changed',function(){
+    //changed by Zlodiak - vo vsem vinovat Kronic!
+    //map.addListener('bounds_changed',function(){
+    map.addListener('dragend',function(){
         getData();
 
     })
