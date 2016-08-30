@@ -45,14 +45,10 @@ public class City {
 
     }
 
-/*    public City (String CGUID, int CExp, int CLevel, String CName, Connection CON) {
-        GUID=CGUID;
-        Exp=CExp;
-        Level=CLevel;
-        Name=CName;
+    public City (Connection CON) {
         con=CON;
     }
-*/
+
 
     public void update() {
         PreparedStatement query;
@@ -79,8 +75,8 @@ public class City {
         ResultSet rs;
         String CName, minName="в чистом поле";
         int TLat,TLng, TRadius, CLevel;
-        int minDist=250+mapper;
-        int minSelfDist=500+mapper;
+        int minDist=125+mapper;
+        int minSelfDist=250+mapper;
         boolean result=true;
         try {
             query = con.prepareStatement("select z2.Name,z1.Lat,z1.Lng,z2.Creator from GameObjects z1, Cities z2 where z2.GUID=z1.GUID and z1.Type='City' and z2.Creator=? and round(6378137 * acos(cos(z1.Lat / 1e6 * PI() / 180) * cos(? / 1e6 * PI() / 180) * cos(z1.Lng / 1e6 * PI() / 180 - ? / 1e6 * PI() / 180) + sin(z1.Lat / 1e6 * PI() / 180) * sin(? / 1e6 * PI() / 180)))<=?");
@@ -114,6 +110,80 @@ public class City {
         }
         return result;
     }
+
+    public void spawn(String PGUID, int TLAT, int TLNG) {
+        MyUtils.Logwrite("City.spawn", "Start");
+        PreparedStatement query;
+        String CUpgradeType, CUName;
+        int LAT, LNG, r;
+        int randLat, randLng, maxRandLng, minRandLng;
+
+        randLat = (int) (Math.random() * 2* 200) - 200;
+        maxRandLng = (int) Math.sqrt(200 * 200 - randLat * randLat);
+        if (Math.abs(randLat) < 125) {
+            minRandLng = (int) Math.sqrt(125 * 125 - randLat * randLat);
+        } else minRandLng = 0;
+        randLng = (int) Math.signum((Math.random() * 20000 - 10000)) * (minRandLng + (int) (Math.random() * (maxRandLng - minRandLng)));
+        int delta_lat_rand = (int) (1000000 * Math.asin((180 / 3.1415926) * (randLat) / (6378137)));
+        int delta_lng_rand = (int) (1000000 * Math.asin((180 / 3.1415926) * (randLng) / (6378137 * Math.cos((TLAT / 1000000) * 3.1415926 / 180))));
+        LAT = TLAT + delta_lat_rand;
+        LNG = TLNG + delta_lng_rand;
+
+        if (canCreateCity(PGUID, LAT, LNG, 0, con)) {
+            try {
+                int i = 0;
+                Random random = new Random();
+                String[] upgrades = new String[7];
+                //String [] upnames = new String [8];
+                query = con.prepareStatement("select Type from Upgrades where level=0");
+                ResultSet rs = query.executeQuery();
+                if (rs.isBeforeFirst()) {
+                    while (rs.next()) {
+                        i = i + 1;
+                        upgrades[i - 1] = rs.getString("Type");
+                        //upnames[i-1]=rs.getString("Name");
+                    }
+                    query.close();
+                    rs.close();
+                } else {
+                    query.close();
+                    rs.close();
+                    return;
+                }
+
+                query = con.prepareStatement("INSERT INTO Cities (GUID,Name,UpgradeType, Creator, Kvant,spawn) VALUES(?,?,?,?,?,?)");
+                String spawnGUID = UUID.randomUUID().toString();
+                query.setString(1, spawnGUID);
+                String CityName = Generate.genCityName(con);
+                query.setString(2, CityName);
+                r = random.nextInt(7);
+                CUpgradeType = upgrades[r];
+                //CUName=upnames[r];
+                query.setString(3, CUpgradeType);
+                query.setString(4, PGUID);
+                query.setBoolean(5, false);
+                query.setBoolean(6, true);
+                query.execute();
+                query.close();
+                MyUtils.Logwrite("City.spawn", "Создан spawn город " + CityName + " GUID=(" + spawnGUID + ")");
+
+                query = con.prepareStatement("INSERT INTO GameObjects(GUID,Lat,Lng,Type)VALUES(?,?,?,'City')");
+                query.setString(1, spawnGUID);
+                query.setInt(2, LAT);
+                query.setInt(3, LNG);
+                query.execute();
+                query.close();
+                con.commit();
+            } catch (SQLException e) {
+                MyUtils.Logwrite("City.spawn", "CGUID=(" + PGUID + ")" + e.toString());
+            }
+        } else {
+            //jresult.put("Error", "Can't set ambush here. City or another ambush is too close.");
+            MyUtils.Logwrite("City.spawn", "Городу spawn ("+randLat+"|"+randLng+") в метрах, ("+delta_lat_rand+"|"+delta_lng_rand+") не повезло, другой город был рядом. CGUID=(" + PGUID + ")");
+        }
+        MyUtils.Logwrite("City.spawn", "Finish");
+    }
+
 
     public void createKvantCity(String PGUID, int TLAT, int TLNG, String Name) {
         PreparedStatement query;
@@ -246,7 +316,7 @@ public class City {
                 jobj.put("Progress",0);
                 jobj.put("UpgradeType",CUpgradeType);
                 jobj.put("UpgradeName",CUName);
-                jobj.put("Radius",100);
+                jobj.put("Radius",50);
                 jobj.put("Influence1",0);
                 jobj.put("Influence2",0);
                 jobj.put("Influence3",0);

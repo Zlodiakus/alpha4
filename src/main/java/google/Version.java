@@ -8,15 +8,31 @@ import utility.StringUtils;
  */
 public class Version {
     public static boolean checkVersion(String version){
-        return  "3.0.0a".equals(version) ||
-                "3.0.1a".equals(version);
+        return  "3.0.7a".equals(version)||
+                "3.0.8a".equals(version)||
+                "3.0.9a".equals(version)||
+                "3.0.10a".equals(version)||
+                "3.0.11a".equals(version)||
+                "3.0.12a".equals(version)||
+                "3.0.13a".equals(version)
+                ;
     }
     public static boolean checkHash(String hash,String version,String operation,String... params){
         String code;
         switch (version){
-            case "3.0.0a":code="COWBOW";
+            case "3.0.7a":code="COWBOW";
                 break;
-            case "3.0.1a":code="COWBOW";
+            case "3.0.8a":code="COWBOW";
+                break;
+            case "3.0.9a":code="COWBOW";
+                break;
+            case "3.0.10a":code="COWBOW";
+                break;
+            case "3.0.11a":code="COWBOW";
+                break;
+            case "3.0.12a":code="COWBOW";
+                break;
+            case "3.0.13a":code="COWBOW";
                 break;
             default: return false;
         }

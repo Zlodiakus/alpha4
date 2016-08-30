@@ -98,6 +98,9 @@ public class Authorize {
         result = jsObject.toJSONString();
         return result;
     }
+
+
+
     private static String doRegister(HttpServletRequest request){
         String result;
         String googleToken=request.getParameter("GoogleToken");
@@ -267,7 +270,11 @@ public class Authorize {
                 }
                 rs2.close();
                 query.close();
-                pstmt = con.prepareStatement("INSERT into Connections (PGUID,Token) Values(?,?)");
+                //Очистка старых коннектов
+                pstmt = con.prepareStatement("DELETE FROM Connections WHERE CurrentDate<ADDDATE( CURRENT_TIMESTAMP( ) , INTERVAL -1\n" +
+                        "DAY )");
+                pstmt.execute();
+                pstmt = con.prepareStatement("INSERT into Connections (PGUID,Token,TokenType) Values(?,?,'C')");
                 pstmt.setString(1, PGUID);
                 pstmt.setString(2, Token);
                 pstmt.execute();
@@ -288,5 +295,7 @@ public class Authorize {
         }
         return result;
     }
+
+
 
 }

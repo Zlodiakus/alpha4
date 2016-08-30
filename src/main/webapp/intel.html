@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style type="text/css">
+        html{height: 100%}
+        body{height: 100%; margin: 0; padding: 0}
+        #map-canvas{height: 100%}
+    </style>
+    <meta charset="utf-8"/>
+    <title>Map of new World.</title>
+    <script src="https://maps.googleapis.com/maps/api/js">
+    </script>
+    <script>
+
+
+    </script>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta name="google-signin-client_id"
+          content="818299087088-ooq951dsv5btv7361u4obhlse0apt3al.apps.googleusercontent.com">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300&subset=latin,cyrillic' rel='stylesheet'
+          type='text/css'/>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="intel/intel.js"></script>
+
+</head>
+<body>
+<div id="LoginZone" style="position:absolute;z-index:100;top:10px; left:50%;">
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+</div>
+<div id="PosDiv" style="position:absolute;z-index:100;top:10px; right:5%;"><button type="button" onclick="setPos()">+</button></div>
+<div id="map-canvas" style="z-index:1;">Intel Caravans</div>
+</body>
+</html>

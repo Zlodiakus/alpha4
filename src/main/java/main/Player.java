@@ -3,6 +3,7 @@ package main;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import javax.json.stream.JsonParser;
 import javax.naming.NamingException;
 //import javax.resource.cci.ResultSet;
 import java.sql.Connection;
@@ -297,7 +298,8 @@ public class Player {
     }
 
     private boolean checkForLevel() {
-        return (Exp>=getTNL());
+        if (Level<20) return (Exp>=getTNL());
+        else return false;
     }
 
 
@@ -314,11 +316,11 @@ public class Player {
             query.execute();
             con.commit();
             query.close();
-            jresult.put("Result","OK");
+            //jresult.put("Result","OK");
         } catch (SQLException e) {
             MyUtils.Logwrite("Player.update","Failed player "+Name+" update. SQL Error: "+e.toString());
-            jresult.put("Result","DB001");
-            jresult.put("Message","Ошибка обновления данных игрока: "+e.toString());
+            //jresult.put("Result","DB001");
+            //jresult.put("Message","Ошибка обновления данных игрока: "+e.toString());
         }
     }
 
@@ -418,7 +420,7 @@ public class Player {
                         Gold -= upcost;
                         UpdatePUpgrades(currentUpgrade.GUID, targetUpgrade.GUID);
                         update();
-                        if (targetUpgrade.Type.equals("cargo")) {bonusUpgradeRecount(targetUpgrade.Effect1/currentUpgrade.Effect1);}
+                        if (targetUpgrade.Type.equals("cargo")) {bonusUpgradeRecount((float)targetUpgrade.Effect1/currentUpgrade.Effect1);}
                         if (targetUpgrade.Type.equals("speed")) {profitUpgradeRecount(targetUpgrade.Effect1,targetUpgrade.Effect2);}
                         city.getGold(upcost/5);
                         //targetUpgrade.update(GUID, con);
@@ -498,7 +500,7 @@ public class Player {
         String UpType,UpName,UpDesc,CarGUID,StartGUID,StartName,FinishGUID,FinishName,AmbGUID,AmbName;
         ResultSet rs;
         JSONArray jarr2 = new JSONArray();
-        if (GUID.equals("")) {jresult.put("Error","No player found."); return jresult.toString();}
+        if (GUID.equals("")) {jresult.put("Result","DB001");jresult.put("Message","Player not found."); return jresult.toString();}
 
         jresult.put("GUID",GUID);
         jresult.put("PlayerName",Name);
@@ -508,7 +510,7 @@ public class Player {
         jresult.put("Race",Race);
         jresult.put("Hirelings",Hirelings);
         //int LeftToHire=getPlayerUpgradeEffect1("leadership") - Hirelings - HirelingsInAmbushes;
-        int LeftToHire=Level*100 - Hirelings - HirelingsInAmbushes;
+        int LeftToHire=Level*(100+5*Level) - Hirelings - HirelingsInAmbushes;
         jresult.put("LeftToHire",LeftToHire);
         //jresult.put("HirelingsInAmbushes",HirelingsInAmbushes);
         PreparedStatement query;
@@ -625,7 +627,7 @@ public class Player {
             jresult.put("Routes",jarr2);
 
             jarr2 = new JSONArray();
-            query=con.prepareStatement("select z1.GUID,z1.Lat,z1.Lng,z2.Name from GameObjects z1, Ambushes z2 where z2.GUID=z1.GUID and z2.PGUID=?");
+            query=con.prepareStatement("select z1.GUID,z1.Lat,z1.Lng,z2.Name,z2.Radius,z2.TTS,z2.Life from GameObjects z1, Ambushes z2 where z2.GUID=z1.GUID and z2.PGUID=?");
             query.setString(1, GUID);
             rs = query.executeQuery();
             while (rs.next()) {
@@ -634,10 +636,15 @@ public class Player {
                 AmbLat=rs.getInt("Lat");
                 AmbLng=rs.getInt("Lng");
                 AmbName="Засада "+rs.getString("Name");
+                jobj.put("Type","Ambush");
                 jobj.put("GUID", AmbGUID);
-                jobj.put("Name", AmbName);
                 jobj.put("Lat", AmbLat);
                 jobj.put("Lng", AmbLng);
+                jobj.put("Owner",0);
+                jobj.put("Radius",rs.getInt("Radius"));
+                jobj.put("Ready",rs.getInt("TTS"));
+                jobj.put("Life",rs.getInt("Life")*10);
+                jobj.put("Name", AmbName);
                 jarr2.add(jobj);
             }
             rs.close();
@@ -701,6 +708,62 @@ public class Player {
         return ret;
     }
 
+    private String fastScan() {
+        PreparedStatement query;
+        ResultSet rs;
+        int radius = getPlayerUpgradeEffect1("paladin");
+        try {
+            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type from GameObjects z1 where z1.Type not like 'City' and ?>=round(6378137 * acos(cos(z1.Lat / 1e6 * PI() / 180) * cos(? / 1e6 * PI() / 180) * cos(z1.Lng / 1e6 * PI() / 180 - ? / 1e6 * PI() / 180) + sin(z1.Lat / 1e6 * PI() / 180) * sin(? / 1e6 * PI() / 180)))");
+            query.setInt(1,radius+65);
+            query.setInt(2,Lat);
+            query.setInt(3,Lng);
+            query.setInt(4,Lat);
+            rs = query.executeQuery();
+            while (rs.next()) {
+                JSONObject jobj = new JSONObject();
+                jobj.put("GUID", rs.getString("GUID"));
+                jobj.put("Lat", rs.getInt("Lat"));
+                jobj.put("Lng", rs.getInt("Lng"));
+                jobj.put("Type", rs.getString("Type"));
+                jarr.add(jobj);
+            }
+            jresult.put("FastScan",jarr);
+        } catch (SQLException e) {
+            jresult.put("Result", "DB001");
+            jresult.put("Message","Ошибка обращения к БД");
+            MyUtils.Logwrite("fastScan","Error: "+e.toString());
+        }
+        return jresult.toString();
+    }
+
+    public void drinkAway(int drinkBonus) {
+        MyUtils.Logwrite("drinkAway","Start");
+        PreparedStatement query,query2;
+        ResultSet rs,rs2;
+        int totalLevel,citiesCount;
+        try {
+            query2=con.prepareStatement("select count(1), sum(Level) from Cities where Creator like ?");
+            query2.setString(1,GUID);
+            rs2=query2.executeQuery();
+            rs2.first();
+            citiesCount=rs2.getInt(1);
+            totalLevel=rs2.getInt(2);
+
+            query = con.prepareStatement("select GUID, Level, Name from Cities where Creator like ?");
+            query.setString(1,GUID);
+            rs = query.executeQuery();
+            while (rs.next()) {
+                City city=new City(rs.getString("GUID"),con);
+                int bonus=(int)(0.2*drinkBonus*rs.getInt("Level")*citiesCount/totalLevel);
+                MyUtils.Logwrite("drinkAway","Пропиваем "+bonus+" золота в "+rs.getString("Name"));
+                city.getGold(bonus,Race);
+            }
+        } catch (SQLException e) {
+            MyUtils.Logwrite("drinkAway","Error: "+e.toString());
+        }
+        MyUtils.Logwrite("drinkAway","Finish");
+    }
+
     public String ScanRange() {
         Random random = new Random();
 
@@ -732,16 +795,28 @@ public class Player {
                     Start = rs.getString("Start");
                     Finish = rs.getString("Finish");
                     Speed = rs.getInt("Speed");
-                    if (TPGUID.equals(GUID)) COwner=0;
-                    else COwner=rs.getInt("Race");
-                    //1-апрельские шутки
-                    //COwner+=1;if (COwner==4) COwner=1;}
-                    //else COwner=random.nextInt(3)+1;
-                    jobj.put("GUID", TGUID);
-                    jobj.put("Type", Type);
-                    jobj.put("Lat", TLat);
-                    jobj.put("Lng", TLng);
-                    jobj.put("Owner", COwner);
+                    if (TPGUID.equals(GUID))
+                    {
+                        COwner=0;
+                        jobj.put("GUID", TGUID);
+                        jobj.put("Type", Type);
+                        jobj.put("Lat", TLat);
+                        jobj.put("Lng", TLng);
+                        jobj.put("Owner", COwner);
+                    }
+                    else {
+                        COwner = rs.getInt("Race");
+                        //1-апрельские шутки
+                        //COwner+=1;if (COwner==4) COwner=1;}
+                        //else COwner=random.nextInt(3)+1;
+                        jobj.put("GUID", TGUID);
+                        jobj.put("Type", Type);
+                        //if (!Name.equals("Shadilan")&&!Name.equals("Zlodiak")) {
+                        //    jobj.put("Lat", TLat);
+                        //    jobj.put("Lng", TLng);
+                        //}
+                        jobj.put("Owner", COwner);
+                    }
 
                     query2 = con.prepareStatement("select z2.Name StartName,z1.Lat StartLat,z1.Lng StartLng,z4.Name FinishName,z3.Lat FinishLat,z3.Lng FinishLng from GameObjects z1, Cities z2, GameObjects z3, Cities z4 where z2.GUID=z1.GUID and z4.GUID=z3.GUID and z1.GUID=? and z3.GUID=?");
                     query2.setString(1, Start);
@@ -782,23 +857,42 @@ public class Player {
                     TTTS = rs.getInt("TTS");
                     TName = rs.getString("Name");
                     TLife=rs.getInt("Life");
-                    if (TPGUID.equals(GUID)) AOwner=0;
-                    else AOwner=rs.getInt("Race");
-                    jobj.put("GUID", TGUID);
-                    jobj.put("Type", Type);
-                    jobj.put("Lat", TLat);
-                    jobj.put("Lng", TLng);
-                    jobj.put("Owner", AOwner);
-                    jobj.put("Radius", TRadius);
-                    jobj.put("Ready", TTTS);
-                    jobj.put("Name",TName);
-                    jobj.put("Life",TLife*10);
-                    jarr.add(jobj);
+                    if (TPGUID.equals(GUID))
+                    {
+                        AOwner=0;
+                        jobj.put("GUID", TGUID);
+                        jobj.put("Type", Type);
+                        jobj.put("Lat", TLat);
+                        jobj.put("Lng", TLng);
+                        jobj.put("Owner", AOwner);
+                        jobj.put("Radius", TRadius);
+                        jobj.put("Ready", TTTS);
+                        jobj.put("Name",TName);
+                        jobj.put("Life",TLife*10);
+                        jarr.add(jobj);
+                    }
+
+                    else
+                    {
+                        AOwner=rs.getInt("Race");
+                        jobj.put("GUID", TGUID);
+                        jobj.put("Type", Type);
+                        //if (!Name.equals("Shadilan")&&!Name.equals("Zlodiak")) {
+                        //    jobj.put("Lat", TLat);
+                        //    jobj.put("Lng", TLng);
+                        //}
+                        jobj.put("Owner", AOwner);
+                        jobj.put("Radius", TRadius);
+                        jobj.put("Ready", TTTS);
+                        jobj.put("Name",TName);
+                        jobj.put("Life",TLife*10);
+                        jarr.add(jobj);
+                    }
                 }
             }
 
             //Города
-            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.Hirelings, z2.Creator, (select Name from Players p where z2.Creator=p.GUID) as CreatorName,z2.Name,z2.Level,z2.Exp currentExp,z3.Exp nextLevelExp,z4.Exp thisLevelExp, z2.UpgradeType, (select z3.Name from Upgrades z3 where z2.UpgradeType=z3.Type and z3.Level=0 LIMIT 1) UName, z2.Influence1, z2.Influence2, z2.Influence3 from GameObjects z1 USE INDEX (`LatLng`), Cities z2, Levels z3, Levels z4 where z2.GUID=z1.GUID and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+? and z3.Type='city' and z3.Level=z2.Level+1 and z4.level=z2.level and z4.Type='City'");
+            query = con.prepareStatement("select z1.GUID, z1.Lat, z1.Lng, z1.Type,z2.Hirelings, z2.Creator, (select Name from Players p where z2.Creator=p.GUID) as CreatorName, (select Name from Cities c where z2.Creator=c.GUID) as CityCreatorName, z2.Name,z2.Level,z2.Exp currentExp,z3.Exp nextLevelExp,z4.Exp thisLevelExp, z2.UpgradeType, (select z3.Name from Upgrades z3 where z2.UpgradeType=z3.Type and z3.Level=0 LIMIT 1) UName, z2.Influence1, z2.Influence2, z2.Influence3 from GameObjects z1 USE INDEX (`LatLng`), Cities z2, Levels z3, Levels z4 where z2.GUID=z1.GUID and ? between z1.Lat-? and z1.Lat+? and ? between z1.Lng-? and z1.Lng+? and z3.Type='city' and z3.Level=z2.Level+1 and z4.level=z2.level and z4.Type='City'");
             query.setInt(1, Lat);
             query.setInt(2, deltaLatCities);
             query.setInt(3, deltaLatCities);
@@ -824,8 +918,8 @@ public class Player {
                     Inf1 = rs.getLong("Influence1");
                     Inf2 = rs.getLong("Influence2");
                     Inf3 = rs.getLong("Influence3");
-                    CRadius=100+5*(CLevel - 1);
-                    CreatorName=rs.getString("CreatorName");
+                    CRadius=50+2*(CLevel - 1);
+                    CreatorName=(rs.getString("CreatorName") == null)?rs.getString("CityCreatorName"):rs.getString("CreatorName");
                     CHirelings=rs.getInt("Hirelings");
                     jobj.put("GUID", TGUID);
                     jobj.put("Type", Type);
@@ -1009,7 +1103,7 @@ public class Player {
                 res=jresult.toString();
             }
         } else {
-            jresult.put("Result", "O0202"); jresult.put("Error", "Засада слишком далеко!");
+            jresult.put("Result", "O0202"); jresult.put("Message", "Засада слишком далеко!");
             res=jresult.toString();
         }
         MyUtils.Logwrite("SetAmbush","Finished by "+Name, r.freeMemory());
@@ -1037,7 +1131,7 @@ public class Player {
                     jobj.put("Result", "OK");
                     if (res.equals(jobj.toString())) {
                         //bonus = 10 + getPlayerUpgradeEffect2("paladin");
-                        bonus = (20 + Math.min(720, ambush.TTS + 180) * ambush.Life) * getPlayerUpgradeEffect2("paladin") / 20;
+                        bonus = ((20 + Math.min(720, ambush.TTS + 180) * ambush.Life) * getPlayerUpgradeEffect2("paladin")) / 20;
                         if (ambush.PGUID.equals("Elf")) bonus+=1000;
                         jobj.put("Message", "Награда за уничтожение засады составила " + Integer.toString(bonus) + " золота!");
                         Hirelings -= 5 * ambush.Life; //апдейт в гетГолде пройдет
@@ -1184,6 +1278,203 @@ public class Player {
         }
         MyUtils.Logwrite("FinishRoute","Finished by "+Name, r.freeMemory());
         return res;
+    }
+
+    public String FinishStartRoute(String TGUID) {
+        JSONArray FRjarr = new JSONArray();
+        boolean flag=false;
+        String restmp="";
+        String mestmp="";
+        MyUtils.Logwrite("FinishStartRoute","Started by "+Name, r.freeMemory());
+        String res,SGUID;
+        String checkUnfinishedRoute,RGUID;
+        if (checkRangeToObj(TGUID)) {
+            checkUnfinishedRoute=getUnfinishedRoute();
+            if (checkUnfinishedRoute.equals("No route")) {
+                //jresult.put("Result","O0603");
+                //jresult.put("Message", "Завершение маршрута не удалось, т.к. маршрут не был стартован");
+                res=jresult.toString();
+                flag=true;
+                restmp="3";
+                mestmp="Завершение маршрута не удалось, т.к. маршрут не был стартован.";
+            }
+            else {
+                if (checkUnfinishedRoute.equals("Error")) {
+                    jresult.put("Result","BD001");
+                    jresult.put("Message", "Ошибка обращения к БД");
+                    res=jresult.toString();
+                    flag=false;
+                }
+                else {
+                    RGUID=checkUnfinishedRoute;
+                    if (!doubleRoute(TGUID,RGUID)) {
+                        int accel = getPlayerUpgradeEffect1("speed");
+                        int speed = getPlayerUpgradeEffect2("speed");
+                        int cargo = getPlayerUpgradeEffect1("cargo");
+                        City cityF = new City (TGUID, con);
+                        try {
+                            PreparedStatement query = con.prepareStatement("select Start from Caravans where Finish is null and PGUID=?");
+                            query.setString(1, GUID);
+                            ResultSet rs0 = query.executeQuery();
+                            rs0.first();
+                            SGUID = rs0.getString("Start");
+                        }
+                        catch (SQLException e) {
+                            jresult.put("Result", "BD001");
+                            jresult.put("Message", "Ошибка обращения к БД");
+                            res = jresult.toString();
+                            return res;
+                        }
+                        City cityS=new City(SGUID,con);
+
+                        if (Hirelings<cityS.Level+cityF.Level) {jresult.put("Result","O0606");jresult.put("Message","Недостаточно людей для запуска каравана. Нужно "+(cityS.Level+cityF.Level));res=jresult.toString();flag=false;}
+                        else {
+                            //Caravan caravan = new Caravan(con);
+                            //res = caravan.FinishRoute(RGUID, TGUID, speed, accel, cargo, con);
+                            String CGUID=TGUID;
+                            //-----------------------------------------------------------------------
+                            //public String FinishRoute(String RGUID, String CGUID, int speed, int accel, int cargo, Connection con) {
+                                JSONObject FRjobj = new JSONObject();
+                                PreparedStatement FRquery;
+                                int FRlevelS,FRlevelF;
+                                double t,t1,t2,s1;
+                                try{
+                                    FRquery=con.prepareStatement("select Lat,Lng from GameObjects where GUID=?");
+                                    FRquery.setString(1,CGUID);
+                                    ResultSet FRrs=FRquery.executeQuery();
+                                    FRrs.first();
+                                    int FRLat=FRrs.getInt(1);
+                                    int FRLng=FRrs.getInt(2);
+                                    //rs.close();
+                                    FRquery=con.prepareStatement("select z1.Lat,z1.Lng,z2.Start from GameObjects z1, Caravans z2 where z2.GUID=? and z2.Start=z1.GUID");
+                                    FRquery.setString(1,RGUID);
+                                    FRrs=FRquery.executeQuery();
+                                    FRrs.first();
+                                    int FRLatS=FRrs.getInt("Lat");
+                                    int FRLngS=FRrs.getInt("Lng");
+                                    String FRStart=FRrs.getString("Start");
+
+                                    if ((FRLatS==FRLat) && (FRLngS==FRLng)) {jresult.put("Result","O0605");jresult.put("Message","Ваш маршрут начинается в этом городе, вы не можете завершить маршрут в нем!");return jresult.toString();}
+                                    FRquery=con.prepareStatement("insert into GameObjects (GUID,Lat,Lng,Type) values (?,?,?,'Caravan')");
+                                    FRquery.setString(1,RGUID);
+                                    FRquery.setInt(2,FRLatS);
+                                    FRquery.setInt(3,FRLngS);
+                                    FRquery.execute();
+
+                                    FRquery=con.prepareStatement("select Level, Name from Cities where GUID=?");
+                                    FRquery.setString(1,FRStart);
+                                    FRrs=FRquery.executeQuery();
+                                    FRrs.first();
+                                    FRlevelS=FRrs.getInt("Level");
+                                    String FRStartName=FRrs.getString("Name");
+
+                                    FRquery=con.prepareStatement("select Level, Name from Cities where GUID=?");
+                                    FRquery.setString(1,CGUID);
+                                    FRrs=FRquery.executeQuery();
+                                    FRrs.first();
+                                    FRlevelF=FRrs.getInt("Level");
+                                    String FRFinishName=FRrs.getString("Name");
+
+                                    int FRDistance=(int)MyUtils.distVincenty(FRLatS,FRLngS,FRLat,FRLng);
+                                    int FRbonus=(int)((Math.sqrt(FRlevelS*FRlevelF)*FRDistance*cargo)/1000);
+                                    t1=(double)(speed-1-accel)/accel;
+                                    s1=(double)((1+accel)*t1+accel*t1*t1/2);
+                                    t2=(double)(FRDistance-s1)/speed;
+                                    t=t1+t2;
+                                    int FRprofit=(int)(60*FRbonus/t);
+                                    FRquery=con.prepareStatement("update Caravans set Finish=?,Speed=1,Distance=?, bonus=?,profit=? where GUID=?");
+                                    FRquery.setString(1,CGUID);
+                                    FRquery.setInt(2,FRDistance);
+                                    FRquery.setInt(3,FRbonus);
+                                    FRquery.setInt(4,FRprofit);
+                                    FRquery.setString(5,RGUID);
+                                    FRquery.execute();
+                                    con.commit();
+//            rs.close();
+                                    FRquery.close();
+                                    restmp ="0";
+                                    FRjobj.put("GUID", RGUID);
+                                    FRjobj.put("Lat",FRLat);
+                                    FRjobj.put("Lng",FRLng);
+                                    FRjobj.put("StartGUID", FRStart);
+                                    FRjobj.put("StartName", FRStartName);
+                                    FRjobj.put("FinishGUID", CGUID);
+                                    FRjobj.put("FinishName", FRFinishName);
+                                    FRjobj.put("Distance", FRDistance);
+                                    FRjobj.put("profit", FRprofit);
+                                    FRjobj.put("StartLat",FRLatS);
+                                    FRjobj.put("StartLng",FRLngS);
+                                    FRjobj.put("FinishLat",FRLat);
+                                    FRjobj.put("FinishLng",FRLng);
+                                    FRjarr.add(FRjobj);
+                                    Hirelings-=cityS.Level+cityF.Level;update();flag=true;
+
+                                } catch (SQLException e) {MyUtils.Logwrite("Caravan.FinishRoute",e.toString());jresult.put("Result","BD001");jresult.put("Message","Ошибка обращения к БД"); /*return jresult.toString();*/}
+                            //    return jresult.toString();
+                            //}
+                            //-----------------------------------------------------------------------
+                        }
+                    }
+                    else {
+                        jresult.put("Result","O0604");
+                        jresult.put("Message","Такой маршрут уже существует, вы не можете создать два одинаковых маршрута!");
+                        res=jresult.toString();
+                        flag=false;
+                    }
+                }
+            }
+        }
+        else {
+            jresult.put("Result","O0602");
+            jresult.put("Message", "Город слишком далеко.");
+            res=jresult.toString();
+            flag=false;
+        }
+        if (flag) {
+            //Caravan caravan = new Caravan(con);
+            //String res2 = caravan.StartRoute(GUID, TGUID, con);
+            //--------------------------------------------------------------------
+            //public String StartRoute(String PGUID, String CGUID, Connection con) {
+            String PGUID=GUID;
+            String CGUID=TGUID;
+            String SRGUID= UUID.randomUUID().toString();
+                JSONObject jobj = new JSONObject();
+                PreparedStatement SRquery;
+                City city = new City(CGUID,con);
+                try{
+                    SRquery=con.prepareStatement("insert into Caravans (GUID,PGUID,Start,Speed) values (?,?,?,?) ");
+                    SRquery.setString(1,SRGUID);
+                    SRquery.setString(2,PGUID);
+                    SRquery.setString(3,CGUID);
+                    SRquery.setInt(4, 0);
+                    SRquery.execute();
+                    con.commit();
+                    SRquery=con.prepareStatement("select Lat,Lng from GameObjects where GUID=?");
+                    SRquery.setString(1,CGUID);
+                    ResultSet SRrs=SRquery.executeQuery();
+                    SRrs.first();
+                    int SRLat=SRrs.getInt(1);
+                    int SRLng=SRrs.getInt(2);
+                    SRquery.close();
+                    if (restmp.equals("0")) {jresult.put("Result","OK");}
+                    else {jresult.put("Result","O060"+restmp); jresult.put("Message",mestmp);}
+                    jobj.put("GUID",SRGUID);
+                    jobj.put("StartLat",SRLat);
+                    jobj.put("StartLng",SRLng);
+                    jobj.put("StartGUID",CGUID);
+                    jobj.put("StartName",city.Name);
+                    FRjarr.add(jobj);
+                } catch (SQLException e) {jresult.put("Result","DB01"+restmp);jresult.put("Message",mestmp+"Ошибка обращения к БД при создании маршрута.");/*return jresult.toString();*/}
+                //jresult.put("Route",jobj);
+            jresult.put("Routes",FRjarr);
+            //    return jresult.toString();
+            //}
+
+            //--------------------------------------------------------------------
+        }
+
+        MyUtils.Logwrite("FinishStartRoute","Finished by "+Name, r.freeMemory());
+        return jresult.toString();
     }
 
     private boolean doubleRoute(String TGUID, String RGUID) {
@@ -1399,6 +1690,12 @@ public class Player {
             case "HirePeople":
                 result=hirePeople(TGUID, AMOUNT);
                 break;
+            case "FastScan":
+                result=fastScan();
+                break;
+            case "FinishStartRoute":
+                result=FinishStartRoute(TGUID);
+                break;
             default:
                 result = "{" + '"' + "Error" + '"' + ": " + '"' + "Unknown command." + '"' + "}";
         }
@@ -1422,7 +1719,7 @@ public class Player {
                 jresult.put("Message", "В городе нет столько наемников!");
                 MyUtils.Logwrite("hirePeople",Name+" В городе нет столько наемников!", r.freeMemory());
             } else {
-                if (Hirelings + HirelingsInAmbushes + AMOUNT > Level*100) {
+                if (Hirelings + HirelingsInAmbushes + AMOUNT > Level*(100+5*Level)) {
                     jresult.put("Result", "O1304");
                     jresult.put("Message", "Вы пока не можете управлять таким количеством наемников!");
                     MyUtils.Logwrite("hirePeople",Name+" Вы пока не можете управлять таким количеством наемников!", r.freeMemory());
@@ -1468,11 +1765,18 @@ public class Player {
             rs=query.executeQuery();
             rs.last();
             total=rs.getRow();
-            Random random=new Random();
-            rand=1+random.nextInt(total);
-            rs.absolute(rand);
-            CGUID=rs.getString("GUID");
-        } catch (SQLException e) {MyUtils.Logwrite("PLayer.getRandomCity",e.toString());CGUID="";}
+            if (total>0) {
+                MyUtils.Logwrite("getRandomCity", "total=" + total);
+                Random random = new Random();
+                rand = 1 + random.nextInt(total);
+                MyUtils.Logwrite("getRandomCity", "rand=" + rand);
+                rs.absolute(rand);
+                MyUtils.Logwrite("getRandomCity", "отработал rs.absolute");
+                CGUID = rs.getString("GUID");
+                MyUtils.Logwrite("getRandomCity", "CGUID=" + CGUID);
+            }
+            else CGUID="";
+        } catch (SQLException e) {MyUtils.Logwrite("Player.getRandomCity",e.toString());CGUID="";}
         return CGUID;
     }
 

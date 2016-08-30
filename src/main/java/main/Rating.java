@@ -10,9 +10,25 @@ import java.sql.SQLException;
  * @author Shadilan
  */
 public class Rating {
+
+    private static String intToSpaceStr(int Int) {
+        String tempStr="",tempStr2="",ret="";
+        tempStr2=Integer.toString(Int);
+        tempStr = new StringBuffer(tempStr2).reverse().toString();
+        tempStr2="";
+        while (tempStr.length()>3) {
+            tempStr2=tempStr2.concat(tempStr.substring(0,3));
+            tempStr2=tempStr2.concat(" ");
+            tempStr=tempStr.substring(3);
+        }
+        tempStr2=tempStr2.concat(tempStr);
+        ret= new StringBuffer(tempStr2).reverse().toString();
+        return ret;
+    }
+
     public static String getFullRate(){
         Connection con = null;
-        String ccolor;
+        String ccolor, sExp="",sGold="",sProfit="",sAmbushed="",sPaladined="",tempStr="", tempStr2="";
         int i=0;
         //String result="<table><tr><td>№</td><td>Имя</td><td>Уровень</td><td>Золото</td><td>Опыт</td><td>Корованов</td><td>Сумарная дистанция</td><td>Максимальная дистанция</td><td>Средняя дистанция</td></tr>";
         String result="";
@@ -34,7 +50,12 @@ public class Rating {
                 if (rs.getInt(6)==3) {
                     ccolor="warning";
                 }
-                result=result+"<tr class="+ccolor+"><td>"+i+"</td><td><b>"+rs.getString(1)+"</b></td><td>"+rs.getInt(2)+"</td><td>"+rs.getInt(3)+"</td><td>"+rs.getInt(4)+"</td><td>"+rs.getInt(5)+"</td><td>"+rs.getInt(7)+"</td><td>"+rs.getInt(8)+"</td><td>"+rs.getInt(9)+"</td></tr>";
+                sExp= intToSpaceStr(rs.getInt(3));
+                sGold= intToSpaceStr(rs.getInt(4));
+                sProfit= intToSpaceStr(rs.getInt(7));
+                sAmbushed=intToSpaceStr(rs.getInt(8));
+                sPaladined=intToSpaceStr(rs.getInt(9));
+                result=result+"<tr class="+ccolor+"><td>"+i+"</td><td><b>"+rs.getString(1)+"</b></td><td class=\"r\">"+rs.getInt(2)+"</td><td class=\"r\">"+sExp+"</td><td class=\"r\">"+sGold+"</td><td class=\"r\">"+rs.getInt(5)+"</td><td class=\"r\">"+sProfit+"</td><td class=\"r\">"+sAmbushed+"</td><td class=\"r\">"+sPaladined+"</td></tr>";
             }
             //result=result+"</table>";
             con.close();

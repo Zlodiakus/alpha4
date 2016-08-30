@@ -9,9 +9,18 @@ String token=Rating.getFullRate();
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" href="bootstrap.min.css">
     <title>Рейтинг</title>
+    <style>
+        body {
+            margin: 15px;
+        }
+
+        td.r {
+            text-align: right;
+        }
+    </style>
 </head>
-<body style="margin: 15px;">
-<div class="col-lg-6">
+<body>
+<div class="col-lg-7">
     <table class="table table-striped table-bordered">
         <thead>
         <tr>
