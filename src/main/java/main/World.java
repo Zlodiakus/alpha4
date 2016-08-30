@@ -37,7 +37,7 @@ public World() throws SQLException {
         try {
             con.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            MyUtils.Logwrite("World.close",e.toString());
         }
     }
 
