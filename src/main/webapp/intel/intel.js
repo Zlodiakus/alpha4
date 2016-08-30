@@ -33,7 +33,11 @@ function initialize(){
     map.addListener('dragend',function(){
         getData();
 
-    })
+    });
+        map.addListener('zoom_changed',function(){
+            getData();
+
+        });
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
